@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nguyen Quang Phu — AI Engineer</title>
-<meta name="description" content="AI Engineer specializing in LLMs, RAG Systems, and Agentic AI — Nguyen Quang Phu">
+<title>Phu Nguyen — AI Engineer</title>
+<meta name="description" content="AI Engineer specializing in LLMs, RAG Systems, and Agentic AI — Phu Nguyen">
 <meta name="author" content="Nguyen Quang Phu">
-<meta property="og:title" content="Nguyen Quang Phu — AI Engineer">
-<meta property="og:description" content="Building the frontier of AI — LLMs, RAG, Agentic AI at FPT Software">
+<meta property="og:title" content="Phu Nguyen — AI Engineer">
+<meta property="og:description" content="Building the frontier of AI — LLMs, RAG, Agentic AI at FPT Software AI Center">
 <!--
   Font strategy (inspired by Brittany Chiang's #1 ranked developer portfolio):
   Single-family approach for maximum cohesion and readability.
@@ -669,17 +669,24 @@ button { font-family: inherit; cursor: pointer; }
   white-space: nowrap;
 }
 .exp-logo {
-  height: 22px;
+  height: 28px;
   width: auto;
   object-fit: contain;
-  opacity: 0.75;
+  opacity: 0.85;
   transition: opacity 0.2s;
+  border-radius: 4px;
 }
 .exp-logo:hover { opacity: 1; }
 .exp-logo-dark  { display: block; }
 .exp-logo-light { display: none; }
 [data-theme="light"] .exp-logo-dark  { display: none; }
 [data-theme="light"] .exp-logo-light { display: block; }
+/* For seal/crest logos with white backgrounds in dark mode */
+:not([data-theme="light"]) .exp-logo[src*="hcmut"] {
+  background: rgba(255,255,255,0.08);
+  padding: 2px;
+  border-radius: 50%;
+}
 
 /* right col: content */
 .exp-right {}
@@ -1415,7 +1422,7 @@ footer {
 <!-- ════ NAVBAR ════ -->
 <nav id="nav" data-testid="navbar">
   <div class="nav-inner">
-    <a href="#hero" class="nav-logo">Quang Phu<span class="dot">.</span></a>
+    <a href="#hero" class="nav-logo">Phu Nguyen<span class="dot">.</span></a>
     <nav class="nav-links" aria-label="Main navigation">
       <a href="#about">About</a>
       <a href="#experience">Experience</a>
@@ -1452,9 +1459,9 @@ footer {
     <div class="hero-body">
 
       <div class="hero-left">
-        <div class="avail-badge">
-          <span class="avail-dot"></span>
-          Open to new opportunities
+        <div class="avail-badge" style="background:rgba(56,189,248,0.08);border-color:rgba(56,189,248,0.25);color:var(--accent);">
+          <span class="avail-dot" style="background:var(--accent);box-shadow:0 0 8px var(--accent);"></span>
+          Currently @ FPT Software AI Center
         </div>
 
         <h1 class="hero-name">
@@ -2003,9 +2010,9 @@ const EXP_DATA = [
     company:   'Ho Chi Minh City University of Technology',
     location:  'Ho Chi Minh City, Vietnam · On-site',
     duration:  '7 mos',
-    logoDark:  null,
-    logoLight: null,
-    logoText:  'HCMUT',
+    logoDark:  'images/hcmut-logo.png',
+    logoLight: 'images/hcmut-logo.png',
+    logoText:  null,
     roles: [
       {
         title:  'Research Assistant',
@@ -2118,8 +2125,8 @@ function closeMob()  { document.getElementById('mob-menu').classList.remove('ope
         (ch === ' ' ? '&nbsp;' : ch) + '</span>';
     }).join('');
   }
-  var line1 = 'Nguyen';
-  var line2 = 'Quang Phu';
+  var line1 = 'Phu';
+  var line2 = 'Nguyen';
   nameEl.innerHTML =
     wrapChars(line1, 0) +
     '<br><span class="grad">' + wrapChars(line2, line1.length + 1) + '</span>';
