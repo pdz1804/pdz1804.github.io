@@ -1,39 +1,34 @@
-/**
- * Welcome to your Workbox-powered service worker!
+/* -----------------------------------------------------------------------------
+ * Tombstone service worker.
  *
- * You'll need to register this file in your web app and you should
- * disable HTTP caching for this file too.
- * See https://goo.gl/nhQhGp
+ * The previous version of this site was a Create React App build that registered
+ * a Workbox service worker at this path. That worker precached the old index.html
+ * and answered navigations from the cache, so browsers that visited before the
+ * rewrite keep serving the old React site no matter what is deployed.
  *
- * The rest of the code is auto-generated. Please don't update this file
- * directly; instead, make changes to your Workbox build configuration
- * and re-run your build process.
- * See https://goo.gl/2aRDsh
- */
+ * Deleting this file would not help: those browsers keep the installed worker
+ * until a *new* worker at the same URL replaces it. This stub is that
+ * replacement — it takes over, drops every cache and unregisters itself, then
+ * reloads open tabs onto the live site. It can be removed once traffic from
+ * pre-rewrite visitors has aged out.
+ * ---------------------------------------------------------------------------*/
 
-importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
-
-importScripts(
-  "/precache-manifest.16b2738c5e0a85be89b4710803a39869.js"
-);
-
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+self.addEventListener('install', function () {
+  self.skipWaiting();
 });
 
-workbox.core.clientsClaim();
-
-/**
- * The workboxSW.precacheAndRoute() method efficiently caches and responds to
- * requests for URLs in the manifest.
- * See https://goo.gl/S9QRab
- */
-self.__precacheManifest = [].concat(self.__precacheManifest || []);
-workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
-
-workbox.routing.registerNavigationRoute(workbox.precaching.getCacheKeyForURL("/index.html"), {
-  
-  blacklist: [/^\/_/,/\/[^/?]+\.[^/]+$/],
+self.addEventListener('activate', function (event) {
+  event.waitUntil(
+    caches.keys()
+      .then(function (keys) {
+        return Promise.all(keys.map(function (key) { return caches.delete(key); }));
+      })
+      .then(function () { return self.registration.unregister(); })
+      .then(function () { return self.clients.matchAll({ type: 'window' }); })
+      .then(function (clients) {
+        clients.forEach(function (client) {
+          if ('navigate' in client) client.navigate(client.url);
+        });
+      })
+  );
 });

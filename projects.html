@@ -4,586 +4,101 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Projects — Phu Nguyen | AI Engineer</title>
-<meta name="description" content="Professional and academic AI projects by Phu Nguyen (Nguyen Quang Phu), AI Engineer at FPT Software — Agentic AI, RAG systems, LLMs, AWS Bedrock, Azure AI.">
+<meta name="description" content="Professional and academic AI projects by Phu Nguyen (Nguyen Quang Phu) — Agentic ERP integrations with MCP, RAG systems, AWS Bedrock AgentCore, Azure AI and applied ML research.">
+<meta name="author" content="Nguyen Quang Phu">
 <meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0d1117">
 <link rel="canonical" href="https://pdz1804.github.io/projects.html">
+
 <meta property="og:type"        content="website">
 <meta property="og:url"         content="https://pdz1804.github.io/projects.html">
 <meta property="og:title"       content="Projects — Phu Nguyen | AI Engineer">
-<meta property="og:description" content="Professional and academic AI projects — Agentic AI, RAG, LLMs, AWS Bedrock, Azure AI.">
+<meta property="og:description" content="Professional and academic AI projects — Agentic AI, MCP integrations, RAG, LLMs, AWS Bedrock and Azure AI.">
 <meta property="og:image"       content="https://pdz1804.github.io/images/PDZ.jpg">
+<meta property="og:site_name"   content="Phu Nguyen Portfolio">
+<meta name="twitter:card"        content="summary">
+<meta name="twitter:title"       content="Projects — Phu Nguyen | AI Engineer">
+<meta name="twitter:description" content="Professional and academic AI projects — Agentic AI, MCP integrations, RAG, LLMs, AWS Bedrock and Azure AI.">
+<meta name="twitter:image"       content="https://pdz1804.github.io/images/PDZ.jpg">
+
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="icons/apple-icon.png">
+<link rel="manifest" href="manifest.json">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-/* ── VIEW TRANSITION ── */
-@view-transition { navigation: auto; }
-::view-transition-old(root) { animation: fade-out 0.22s ease; }
-::view-transition-new(root) { animation: fade-in  0.22s ease; }
-@keyframes fade-out { from{opacity:1} to{opacity:0} }
-@keyframes fade-in  { from{opacity:0} to{opacity:1} }
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
 
-/* ── TOKENS ── */
-:root {
-  --bg-0:   #0d1117;
-  --bg-1:   #111827;
-  --bg-2:   #1a2332;
-  --card:   rgba(26,35,50,0.9);
-  --t-high: #f0f6ff;
-  --t-mid:  #94a3b8;
-  --t-low:  #475569;
-  --accent: #38bdf8;
-  --accent2: #34d399;
-  --bdr:    rgba(56,189,248,0.12);
-  --bdr-hover: rgba(56,189,248,0.36);
-  --shadow: 0 4px 24px rgba(0,0,0,0.5);
-  --shadow-lg: 0 12px 48px rgba(0,0,0,0.6);
-  --nav-bg: rgba(13,17,23,0.85);
-  --nav-h:  64px;
-  --max-w:  1100px;
-  --pad:    0 32px;
-}
-[data-theme="light"] {
-  --bg-0:   #ffffff; --bg-1:   #f8fafc; --bg-2:   #f1f5f9;
-  --card:   rgba(255,255,255,0.95);
-  --t-high: #0f172a; --t-mid:  #475569; --t-low:  #94a3b8;
-  --accent: #0284c7; --accent2: #059669;
-  --bdr:    rgba(2,132,199,0.14); --bdr-hover: rgba(2,132,199,0.38);
-  --shadow: 0 4px 24px rgba(15,23,42,0.10);
-  --shadow-lg: 0 12px 48px rgba(15,23,42,0.14);
-  --nav-bg: rgba(255,255,255,0.88);
-}
-
-/* ── RESET ── */
-*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 16px;
-  line-height: 1.7;
-  background: var(--bg-1);
-  color: var(--t-high);
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  transition: background 0.3s, color 0.3s;
-}
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg-0); }
-::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
-a { color: inherit; text-decoration: none; }
-img { display: block; max-width: 100%; }
-ul { list-style: none; }
-
-/* ── NAV ── */
-#nav {
-  position: fixed; top:0; left:0; right:0; z-index:1000;
-  height: var(--nav-h);
-  background: var(--nav-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--bdr);
-  transition: box-shadow 0.3s;
-}
-.nav-inner {
-  max-width: var(--max-w); margin: 0 auto; padding: var(--pad);
-  height: 100%;
-  display: flex; align-items: center; justify-content: space-between; gap: 24px;
-}
-.nav-logo {
-  font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
-  font-size: 1.125rem; font-weight: 800;
-  color: var(--t-high); letter-spacing: -0.02em;
-}
-.nav-logo .dot { color: var(--accent); }
-.nav-back {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 7px 18px;
-  font-size: 0.875rem; font-weight: 600;
-  color: var(--accent); border: 1.5px solid var(--bdr-hover);
-  border-radius: 8px; transition: background 0.2s, transform 0.2s;
-}
-.nav-back:hover { background: rgba(56,189,248,0.08); transform: translateX(-2px); }
-[data-theme="light"] .nav-back:hover { background: rgba(2,132,199,0.08); }
-.nav-right { display: flex; align-items: center; gap: 10px; }
-.theme-btn {
-  width: 36px; height: 36px; border-radius: 8px;
-  border: 1px solid var(--bdr); background: transparent;
-  color: var(--t-mid); font-size: 1rem;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-family: inherit;
-  transition: border-color 0.2s, color 0.2s;
-}
-.theme-btn:hover { border-color: var(--bdr-hover); color: var(--accent); }
-
-/* ── LAYOUT ── */
-.wrap { max-width: var(--max-w); margin: 0 auto; padding: var(--pad); }
-.page-body { padding-top: calc(var(--nav-h) + 60px); padding-bottom: 100px; }
-
-/* ── HERO BANNER ── */
-.page-hero {
-  background: var(--bg-0);
-  border-bottom: 1px solid var(--bdr);
-  padding: calc(var(--nav-h) + 56px) 0 56px;
-  margin-bottom: 0;
-}
-.page-hero-inner {
-  max-width: var(--max-w); margin: 0 auto; padding: var(--pad);
-}
-.eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
-}
-.eyebrow::before { content:''; width:20px; height:2px; background:var(--accent); border-radius:1px; }
-.page-title {
-  font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
-  font-size: clamp(2rem, 4vw, 3.25rem);
-  font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
-  color: var(--t-high); margin-bottom: 14px;
-}
-.page-sub {
-  font-size: 1.0625rem; color: var(--t-mid); line-height: 1.75; max-width: 540px;
-}
-
-/* ── SECTION HEADERS ── */
-.section { padding: 72px 0; }
-.section + .section { border-top: 1px solid var(--bdr); }
-.sec-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
-}
-.sec-eyebrow::before { content:''; width:20px; height:2px; background:var(--accent); border-radius:1px; }
-.sec-title {
-  font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
-  font-weight: 800; letter-spacing: -0.025em; line-height: 1.15;
-  color: var(--t-high); margin-bottom: 8px;
-}
-.sec-sub {
-  font-size: 1rem; color: var(--t-mid); max-width: 480px; margin-bottom: 44px; line-height: 1.75;
-}
-
-/* ── SCROLL REVEAL ── */
-.r { opacity:0; transform:translateY(20px); transition:opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1); }
-.r.on { opacity:1; transform:none; }
-
-/* ── PROFESSIONAL PROJECT CARDS ── */
-.pro-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-  gap: 20px;
-}
-.pro-card {
-  background: var(--card);
-  border: 1px solid var(--bdr);
-  border-radius: 18px;
-  padding: 28px 30px;
-  display: flex; flex-direction: column; gap: 16px;
-  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-.pro-card:hover { border-color: var(--bdr-hover); transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-.pro-card-top {
-  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
-}
-.pro-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 10px; border-radius: 100px;
-  font-size: 0.75rem; font-weight: 700;
-  background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.22);
-  color: var(--accent); white-space: nowrap;
-}
-[data-theme="light"] .pro-badge { background: rgba(2,132,199,0.08); border-color: rgba(2,132,199,0.22); color: #0284c7; }
-.pro-period {
-  font-size: 0.8125rem; font-weight: 600; color: var(--t-low); white-space: nowrap;
-}
-.pro-title {
-  font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
-  font-size: 1.125rem; font-weight: 700; color: var(--t-high); line-height: 1.3;
-}
-.pro-meta {
-  font-size: 0.875rem; color: var(--t-low); margin-top: -6px;
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
-.pro-meta span { display: flex; align-items: center; gap: 4px; }
-.pro-desc {
-  font-size: 0.9375rem; color: var(--t-mid); line-height: 1.75; flex: 1;
-}
-.pro-buls { display: flex; flex-direction: column; gap: 7px; }
-.pro-buls li {
-  font-size: 0.9375rem; color: var(--t-mid); line-height: 1.7;
-  padding-left: 16px; position: relative;
-}
-.pro-buls li::before { content:'▸'; position:absolute; left:0; color:var(--accent); font-size:0.7rem; top:5px; }
-.pro-buls li strong { color: var(--t-high); font-weight: 600; }
-.pro-supervisor {
-  font-size: 0.875rem; color: var(--t-low); font-style: italic;
-  display: flex; align-items: flex-start; gap: 6px; line-height: 1.55;
-}
-.pro-supervisor::before { content:'—'; color:var(--accent2); font-style:normal; font-weight:700; flex-shrink:0; }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.tag {
-  padding: 4px 10px; font-size: 0.8125rem; font-weight: 500;
-  color: var(--accent); background: rgba(56,189,248,0.07);
-  border: 1px solid rgba(56,189,248,0.18); border-radius: 6px;
-}
-[data-theme="light"] .tag { color:#0284c7; background:rgba(2,132,199,0.07); border-color:rgba(2,132,199,0.18); }
-.award-tag {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 12px; border-radius: 100px;
-  background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.25);
-  font-size: 0.8125rem; font-weight: 600; color: var(--accent2);
-}
-[data-theme="light"] .award-tag { color:#059669; background:rgba(5,150,105,0.07); border-color:rgba(5,150,105,0.25); }
-
-/* ── ACADEMIC PROJECT CARDS ── */
-.acad-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-}
-.acad-card {
-  background: var(--card);
-  border: 1px solid var(--bdr);
-  border-radius: 16px; padding: 26px;
-  display: flex; flex-direction: column;
-  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
-  transform-style: preserve-3d;
-}
-.acad-card:hover { border-color: var(--bdr-hover); transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-.acad-num { font-size: 0.8125rem; font-weight: 700; color: var(--accent2); margin-bottom: 10px; }
-[data-theme="light"] .acad-num { color:#059669; }
-.acad-title {
-  font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', sans-serif;
-  font-size: 1.0625rem; font-weight: 700; color: var(--t-high); line-height: 1.35; margin-bottom: 6px;
-}
-.acad-date { font-size: 0.8125rem; color: var(--t-low); font-weight: 500; margin-bottom: 14px; }
-.acad-desc { font-size: 0.9375rem; color: var(--t-mid); line-height: 1.75; flex: 1; margin-bottom: 18px; }
-
-/* ── FOOTER ── */
-.proj-footer {
-  padding: 28px 32px;
-  background: var(--bg-0);
-  border-top: 1px solid var(--bdr);
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 12px;
-}
-.proj-footer p { font-size: 0.875rem; color: var(--t-low); }
-.proj-footer a { color: var(--accent); font-weight: 500; }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 860px) {
-  .pro-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 768px) {
-  :root { --nav-h: 60px; --pad: 0 20px; }
-  .page-hero { padding-top: calc(var(--nav-h) + 36px); }
-}
-</style>
+<script>
+(function () {
+  var saved;
+  try { saved = localStorage.getItem('nqp-theme'); } catch (e) {}
+  var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  document.documentElement.setAttribute('data-theme', saved || (prefersLight ? 'light' : 'dark'));
+})();
+</script>
 </head>
+
 <body>
 
-<!-- NAV -->
-<nav id="nav">
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="progress-bar" aria-hidden="true"></div>
+
+<!-- ════════ NAV ════════ -->
+<nav id="nav" data-testid="navbar">
   <div class="nav-inner">
     <a href="index.html" class="nav-logo">Phu Nguyen<span class="dot">.</span></a>
     <div class="nav-right">
-      <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+      <span class="nav-cta" data-render="nav-cta"></span>
+      <button class="theme-btn" id="theme-btn" aria-label="Toggle colour theme" onclick="toggleTheme()">🌙</button>
       <a href="index.html" class="nav-back">← Back to Portfolio</a>
     </div>
   </div>
 </nav>
 
-<!-- PAGE HERO BANNER -->
+<main id="main">
+
+<!-- ════════ PAGE HERO ════════ -->
 <div class="page-hero">
   <div class="page-hero-inner">
     <span class="eyebrow">Portfolio</span>
     <h1 class="page-title">All Projects</h1>
-    <p class="page-sub">Professional work and academic research — from production AI systems at enterprise scale to machine learning coursework at HCMUT.</p>
+    <p class="page-sub">
+      Production systems built at FPT Software AI Center alongside academic research at HCMUT —
+      <span data-render="projects-count"></span>
+    </p>
   </div>
 </div>
 
-<!-- ════ PROFESSIONAL PROJECTS ════ -->
-<section class="section">
+<!-- ════════ PROFESSIONAL ════════ -->
+<section class="section" data-testid="professional-projects">
   <div class="wrap">
-    <span class="sec-eyebrow">Industry Work</span>
+    <span class="eyebrow">Industry Work</span>
     <h2 class="sec-title">Professional Projects</h2>
-    <p class="sec-sub">Production systems built at FPT Software AI Center in collaboration with global partners and research institutions.</p>
-
-    <div class="pro-grid">
-
-      <!-- P1: Healthcare Agentic Chatbot -->
-      <div class="pro-card r">
-        <div class="pro-card-top">
-          <span class="pro-badge">Agentic AI</span>
-          <span class="pro-period">Nov 2025 – Present</span>
-        </div>
-        <h3 class="pro-title">Healthcare Agentic Chatbot &amp; Management Portal</h3>
-        <div class="pro-meta">
-          <span>🏢 FPT Software AI Center</span>
-          <span>👥 Team of 10</span>
-          <span>💼 Associate AI Engineer</span>
-        </div>
-        <ul class="pro-buls">
-          <li>Architected and deployed an Agentic Chatbot specialising in Healthcare Products using AWS Bedrock AgentCore — including Product Recommendation Agent, Health &amp; Lifestyle Agent, and Product Education Agent</li>
-          <li>Engineered comprehensive Management Portal covering component configuration &amp; setup, real-time monitoring dashboards, automated testing, and audit logging</li>
-          <li>Led technical transition from Proof of Concept (POC) to production-ready system; achieved system accuracy <strong>&gt;90%</strong></li>
-          <li>Optimised agent design for maximum component reusability and minimal latency</li>
-        </ul>
-        <span class="award-tag">🏆 "Best Team" Award — FPT Americas (ST25)</span>
-        <div class="tags">
-          <span class="tag">AWS Bedrock AgentCore</span>
-          <span class="tag">Agentic AI</span>
-          <span class="tag">LLMs</span>
-          <span class="tag">AWS</span>
-          <span class="tag">Python</span>
-        </div>
-      </div>
-
-      <!-- P2: Smart Recommendation System -->
-      <div class="pro-card r" style="transition-delay:0.07s">
-        <div class="pro-card-top">
-          <span class="pro-badge">🎯 Recommendation</span>
-          <span class="pro-period">Oct – Nov 2025</span>
-        </div>
-        <h3 class="pro-title">Smart Product Recommendation System</h3>
-        <div class="pro-meta">
-          <span>🏢 FPT Software AI Center</span>
-          <span>👥 Team of 10</span>
-          <span>💼 Associate AI Engineer</span>
-        </div>
-        <ul class="pro-buls">
-          <li>Developed a Smart Recommendation System for a skin health mobile app — using customer data, scan scores, health goals, product catalog, and market rules to generate personalised AI-driven suggestions</li>
-          <li>Ensured legal compliance with enterprise and regulatory requirements</li>
-          <li>Monitored latency and quality metrics; implemented quality gates and automated testing for production deployment; verified system accuracy <strong>&gt;90%</strong></li>
-        </ul>
-        <div class="tags">
-          <span class="tag">Recommendation Engine</span>
-          <span class="tag">LLMs</span>
-          <span class="tag">Python</span>
-          <span class="tag">AWS</span>
-        </div>
-      </div>
-
-      <!-- P3: Azure Blog System -->
-      <div class="pro-card r" style="transition-delay:0.14s">
-        <div class="pro-card-top">
-          <span class="pro-badge">☁️ Azure</span>
-          <span class="pro-period">Aug – Oct 2025</span>
-        </div>
-        <h3 class="pro-title">Blog System with AI Search &amp; Recommendation</h3>
-        <div class="pro-meta">
-          <span>🏢 FPT Software AI Center</span>
-          <span>👥 Team of 4</span>
-          <span>💼 AI Engineer Intern</span>
-        </div>
-        <div class="pro-supervisor">Dr. Nguyen Duy Khuong (Principal Data Scientist), FPT Software AI Center</div>
-        <ul class="pro-buls">
-          <li>Designed and implemented a full-stack blog system with AI-powered semantic search and personalised recommendation capabilities</li>
-          <li>Integrated Azure AI Search, Azure Cosmos DB (NoSQL), Azure Cache for Redis, and Azure OpenAI (AI Foundry) for optimal performance</li>
-          <li>Built recommendation engine and low-latency caching strategy for personalised content discovery</li>
-        </ul>
-        <div class="tags">
-          <span class="tag">Azure AI Search</span>
-          <span class="tag">Azure OpenAI</span>
-          <span class="tag">Cosmos DB</span>
-          <span class="tag">Redis</span>
-          <span class="tag">Python</span>
-        </div>
-      </div>
-
-      <!-- P4: M3ARAG -->
-      <div class="pro-card r" style="transition-delay:0.21s">
-        <div class="pro-card-top">
-          <span class="pro-badge">📄 RAG</span>
-          <span class="pro-period">Aug – Oct 2025</span>
-        </div>
-        <h3 class="pro-title">M3ARAG — Multi-Agent RAG for Document Understanding</h3>
-        <div class="pro-meta">
-          <span>🏢 FPT Software AI Center</span>
-          <span>👥 Team of 2</span>
-          <span>💼 AI Engineer Intern</span>
-        </div>
-        <div class="pro-supervisor">Dr. Nguyen Duy Khuong (Principal Data Scientist), FPT Software AI Center</div>
-        <ul class="pro-buls">
-          <li>Designed and implemented a Multi-Agent RAG system for document intelligence supporting PDFs, HTML, Office documents, and plain text</li>
-          <li>Enabled locally deployable solution with GPU acceleration via Docling — zero cloud dependency, on-premises ready</li>
-          <li>Architected the multi-agent pipeline combining semantic search and generation capabilities</li>
-        </ul>
-        <div class="tags">
-          <span class="tag">RAG</span>
-          <span class="tag">Multi-Agent</span>
-          <span class="tag">Docling</span>
-          <span class="tag">GPU</span>
-          <span class="tag">LLMs</span>
-        </div>
-      </div>
-
-      <!-- P5: Dual Attention -->
-      <div class="pro-card r" style="transition-delay:0.28s">
-        <div class="pro-card-top">
-          <span class="pro-badge">🔬 Research</span>
-          <span class="pro-period">Jun – Jul 2025</span>
-        </div>
-        <h3 class="pro-title">Dual Attention Model for Innovation Discovery</h3>
-        <div class="pro-meta">
-          <span>🏢 FPT Software AI Center</span>
-          <span>👥 Team of 2</span>
-          <span>💼 Research Assistant Intern</span>
-        </div>
-        <div class="pro-supervisor">Prof. Kazuyuki Motohashi (The University of Tokyo) &amp; Dr. Nguyen Duy Khuong (FPT Software AI Center)</div>
-        <ul class="pro-buls">
-          <li>Developed the Dual Attention Model — an attention-based deep learning model to extract technical and firm-related keywords from company websites, improving signal extraction for downstream innovation analysis</li>
-          <li>Implemented a Transformation Matrix to align Company and Patent datasets for cross-domain analysis</li>
-          <li>Executed end-to-end Innovation Discovery pipeline: web scraping, preprocessing, normalisation, training, evaluation, and reporting</li>
-        </ul>
-        <div class="tags">
-          <span class="tag">Attention Mechanism</span>
-          <span class="tag">Deep Learning</span>
-          <span class="tag">PyTorch</span>
-          <span class="tag">NLP</span>
-          <span class="tag">Python</span>
-        </div>
-      </div>
-
-      <!-- P6: Knowledge Graph (HCMUT) -->
-      <div class="pro-card r" style="transition-delay:0.35s">
-        <div class="pro-card-top">
-          <span class="pro-badge">🔭 Research</span>
-          <span class="pro-period">Jun – Dec 2024</span>
-        </div>
-        <h3 class="pro-title">Unsupervised Knowledge Graph Construction Framework</h3>
-        <div class="pro-meta">
-          <span>🏢 HCMUT</span>
-          <span>💼 Research Assistant</span>
-        </div>
-        <div class="pro-supervisor">Mr. Bui Cong Tuan (PhD Candidate), HCMUT</div>
-        <ul class="pro-buls">
-          <li>Researched and designed an unsupervised framework for building Knowledge Graphs from scratch with minimal domain expert involvement</li>
-          <li>Analysed SOTA LLM performance in generating Entities and Intents from raw Vietnamese documents</li>
-          <li>Investigated SOTA techniques in Embedding, Dimensionality Reduction, and Clustering to reduce bias in abstract Knowledge Graph entities</li>
-        </ul>
-        <div class="tags">
-          <span class="tag">Knowledge Graph</span>
-          <span class="tag">LLMs</span>
-          <span class="tag">NLP</span>
-          <span class="tag">Clustering</span>
-          <span class="tag">Python</span>
-        </div>
-      </div>
-
-    </div>
+    <p class="sec-sub">Delivered at work, in collaboration with global partners and research institutions.</p>
+    <div class="pro-grid" data-render="projects-professional"></div>
   </div>
 </section>
 
-<!-- ════ ACADEMIC PROJECTS ════ -->
-<section class="section" style="background: var(--bg-2);">
+<!-- ════════ ACADEMIC ════════ -->
+<section class="section section-alt" data-testid="academic-projects">
   <div class="wrap">
-    <span class="sec-eyebrow">Academic Work</span>
+    <span class="eyebrow">Academic Work</span>
     <h2 class="sec-title">Research &amp; Coursework Projects</h2>
-    <p class="sec-sub">ML/DL projects from Machine Learning and NLP courses at HCMUT.</p>
-
-    <div class="acad-grid">
-
-      <div class="acad-card r">
-        <div class="acad-num">A01</div>
-        <h3 class="acad-title">Sentiment Analysis with Various Models</h3>
-        <p class="acad-date">April 2025 · Team of 5 · Machine Learning Course</p>
-        <p class="acad-desc">Implemented and compared multiple ML/DL models — Decision Trees, Naïve Bayes, SVM, XGBoost, Random Forest, MLP, and Bi-LSTM. Focused on feature transformation, high-dimensional data handling, hyperparameter tuning, and systematic model evaluation across architectures.</p>
-        <div class="tags">
-          <span class="tag">Python</span>
-          <span class="tag">Scikit-learn</span>
-          <span class="tag">Keras</span>
-          <span class="tag">PyTorch</span>
-          <span class="tag">Bi-LSTM</span>
-        </div>
-      </div>
-
-      <div class="acad-card r" style="transition-delay:0.08s">
-        <div class="acad-num">A02</div>
-        <h3 class="acad-title">Fine-tuning Language Models for NLP Tasks</h3>
-        <p class="acad-date">April 2025 · Team of 5 · NLP Course</p>
-        <p class="acad-desc">Fine-tuned pre-trained language models for sentiment analysis, question answering, and machine translation. Implemented and compared T5-Base, BART-Base, and Flan-T5-Small — assessed accuracy, efficiency, and compute trade-offs with full GPU pipeline on Kaggle and Colab.</p>
-        <div class="tags">
-          <span class="tag">HuggingFace</span>
-          <span class="tag">T5</span>
-          <span class="tag">BART</span>
-          <span class="tag">Flan-T5</span>
-          <span class="tag">PyTorch</span>
-        </div>
-      </div>
-
-      <div class="acad-card r" style="transition-delay:0.16s">
-        <div class="acad-num">A03</div>
-        <h3 class="acad-title">Detect AI-generated Text</h3>
-        <p class="acad-date">December 2024 · Team of 3 · Programming Integration Course</p>
-        <p class="acad-desc">Evaluated SVM, Random Forest, XGBoost, Neural Networks, and Distilled BERT for AI text classification in the educational domain. Analysed model performance detecting LLM-generated essays — focused on accuracy, generalisation, and robustness across text styles.</p>
-        <div class="tags">
-          <span class="tag">BERT</span>
-          <span class="tag">SVM</span>
-          <span class="tag">XGBoost</span>
-          <span class="tag">Scikit-learn</span>
-          <span class="tag">PyTorch</span>
-        </div>
-      </div>
-
-    </div>
+    <p class="sec-sub">Machine Learning and NLP projects from coursework and independent research at HCMUT.</p>
+    <div class="acad-grid" data-render="projects-academic"></div>
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer class="proj-footer">
-  <p>Nguyen Quang Phu · AI Engineer · 2026</p>
-  <a href="index.html">← Back to Portfolio</a>
-</footer>
+</main>
 
-<script>
-/* THEME */
-(function(){
-  var saved = localStorage.getItem('nqp-theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
-  document.getElementById('theme-btn').textContent = saved === 'dark' ? '☀️' : '🌙';
-})();
-function toggleTheme(){
-  var html = document.documentElement;
-  var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('nqp-theme', next);
-  document.getElementById('theme-btn').textContent = next === 'dark' ? '☀️' : '🌙';
-}
+<footer data-render="footer"></footer>
 
-/* SCROLL REVEAL */
-(function(){
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); } });
-  }, { threshold: 0.12, rootMargin: '0px 0px -20px 0px' });
-  document.querySelectorAll('.r').forEach(function(el){ io.observe(el); });
-})();
+<button id="scroll-top" onclick="scrollToTop()" aria-label="Back to top">↑</button>
 
-/* CARD TILT */
-(function(){
-  document.querySelectorAll('.pro-card, .acad-card').forEach(function(card){
-    card.addEventListener('mousemove', function(e){
-      var r = card.getBoundingClientRect();
-      var x = (e.clientX - r.left) / r.width  - 0.5;
-      var y = (e.clientY - r.top)  / r.height - 0.5;
-      card.style.transition = 'transform 0.08s';
-      card.style.transform  = 'perspective(700px) rotateX('+(-y*6)+'deg) rotateY('+(x*6)+'deg) translateZ(5px)';
-    });
-    card.addEventListener('mouseleave', function(){
-      card.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1)';
-      card.style.transform  = '';
-    });
-  });
-})();
-
-/* NAV SCROLL SHADOW */
-window.addEventListener('scroll', function(){
-  document.getElementById('nav').style.boxShadow = scrollY > 16 ? '0 4px 24px rgba(0,0,0,0.4)' : '';
-}, { passive: true });
-</script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/render.js"></script>
+<script src="assets/js/ui.js"></script>
 </body>
 </html>

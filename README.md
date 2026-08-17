@@ -1,63 +1,130 @@
-# Personal Portfolio Website
+# Phu Nguyen — Portfolio
 
-Welcome to my personal portfolio website! This website showcases my projects, skills, experience, and contact information.
+Personal portfolio for **Nguyen Quang Phu**, AI Engineer at FPT Software AI Center.
 
-## Features
+**Live:** <https://pdz1804.github.io/>
 
-- **Projects**: A display of my key projects with details about technologies used.
-- **Skills**: An overview of my technical expertise in various areas.
-- **Experience**: A summary of my professional and academic journey.
-- **Contact**: Easy ways to get in touch with me.
+A hand-built static site — no framework, no build step, no dependencies. Two HTML
+pages render themselves from a single content file, so adding a project, a job or
+a certification never means touching markup.
 
-## Live Demo
+## Run it
 
-You can visit my portfolio at: [https://pdz1804.github.io/](https://pdz1804.github.io/)
+Open `index.html` in a browser. That's the whole workflow.
 
-## Technologies Used
+For an exact match with GitHub Pages (absolute paths, service-worker behaviour),
+serve it over HTTP instead:
 
-- **Frontend**: React.js
-- **Styling**: CSS
-- **Hosting**: GitHub Pages
-- **Development**: Node.js
+```sh
+python -m http.server 8080
+# → http://localhost:8080
+```
 
-## Template Credit
+## Layout
 
-This portfolio is built using the amazing [masterPortfolio](https://github.com/ashutosh1919/masterPortfolio) template created by [Ashutosh Hathidara](https://github.com/ashutosh1919). A big thanks to them for their incredible work and for making this template available for developers like me!
+```
+index.html              landing page — semantic shell, no content
+projects.html           full project catalogue — semantic shell, no content
+assets/
+  css/main.css          all styling for both pages
+  js/data.js            ← every piece of content lives here
+  js/render.js          data → DOM
+  js/ui.js              theme, nav, reveal, canvas, counters, tilt
+  cv/                   downloadable CV (phone-free build — see below)
+images/                 profile photo and company logos
+icons/                  favicons and PWA icons
+tools/validate-data.js  data integrity check
+tools/verify-browser.js opt-in Playwright verification suite
+docs/screenshots/       development screenshots (not served content)
+```
 
-## How to Run Locally
+## Editing content
 
-To run this project locally, follow these steps:
+Everything you'd want to update lives in **`assets/js/data.js`**. Nothing else
+needs to change — counts, card numbering, animation timing and the "Show all N
+certifications" button all derive from the data.
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/pdz1804/pdz1804.github.io.git
-   cd pdz1804.github.io
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the development server:
-   ```bash
-   npm start
-   ```
-4. Open your browser and visit:
-   ```bash
-   http://localhost:3000
-   ```
+| To add… | Edit | Happens automatically |
+|---|---|---|
+| A job | the company's `roles[]` in `experience` | tenure recalculates from role dates |
+| A company | `experience[]` | new logo group renders |
+| A project | `projects.professional[]` or `.academic[]` | project counter, card numbering, "View all N" |
+| A certification | `certifications[]` | hero counter, sort order, show-more button |
+| A degree | `education[]` | card renders with optional GPA block |
+| A skill | the group's `items[]` in `skills` | bar width comes from `level` |
 
-## Contributing
+After editing, check the data before publishing:
 
-Feel free to fork this repository and contribute by adding new features or improving existing ones. Contributions are always welcome!
+```sh
+node tools/validate-data.js
+```
+
+It catches what an edit to `data.js` can realistically break — a certification
+pointing at an issuer with no badge, a skill level with no bar width, a malformed
+date that would corrupt the tenure figure, a project with no tags, a nav link to
+a section that doesn't exist. Exits non-zero on error, so it can gate a commit.
+
+For a full browser pass — both pages, both themes, desktop and mobile, reduced
+motion, every link — there's an opt-in Playwright suite. It is not a dependency
+of the site; install it only when you want to run it:
+
+```sh
+python -m http.server 8099          # separate terminal, repo root
+npm install --no-save playwright
+node tools/verify-browser.js        # 67 checks, screenshots in tools/shots/
+```
+
+Conventions worth keeping:
+
+- Machine dates are `'YYYY-MM'`. `end: null` marks a role as current — that's
+  what drives the "Current" pill and the running tenure figure.
+- `period` is the human label shown on screen; keep it consistent with the
+  machine dates.
+- Skill bar widths come from `level` (`advanced` / `proficient` / `intermediate` /
+  `familiar`), never a hand-tuned percentage. Adjust the mapping once in
+  `SKILL_LEVELS` at the bottom of `data.js`.
+- A new certification issuer needs one entry in `certIssuers` for its badge and
+  colour.
+- `featured: true` on a professional project also surfaces it on the landing page.
+- Bullet strings accept inline HTML (`<strong>`, `<em>`) — write `&amp;` for a
+  literal ampersand.
+
+## Styling
+
+`assets/css/main.css` is the only stylesheet. Every colour is a token declared in
+the `:root` block; the light theme is produced solely by redefining those tokens
+in the `[data-theme="light"]` block. Components never hardcode a hex value, so a
+new component works in both themes without a theme-specific rule.
+
+## Updating the CV download
+
+`assets/cv/Nguyen_Quang_Phu_CV.pdf` is a **phone-free** build of the 2-page CV —
+the source in `D:\Personal\CV\CV_2page` keeps the phone number, which should not
+go on a public, crawlable page. To refresh it after a CV change:
+
+```sh
+cp -r "D:/Personal/CV/CV_2page" ./cv-build && cd cv-build
+# delete the "(+84) …" phone fragment from the header block in CV_2page.tex
+pdflatex CV_2page.tex && pdflatex CV_2page.tex
+cp CV_2page.pdf ../assets/cv/Nguyen_Quang_Phu_CV.pdf
+cd .. && rm -rf cv-build
+```
+
+Set `profile.resume.enabled` to `false` in `data.js` to hide the download
+button everywhere without removing the file.
+
+## Notes
+
+- `service-worker.js` is a tombstone that unregisters the Workbox worker left
+  behind by the previous Create React App build. Removing it would strand
+  returning visitors on the old cached site. See the comments in that file.
+- The site was previously built on the
+  [masterPortfolio](https://github.com/ashutosh1919/masterPortfolio) template by
+  [Ashutosh Hathidara](https://github.com/ashutosh1919). None of that code
+  remains, but credit where it's due.
 
 ## Contact
 
-If you have any questions or want to collaborate, you can reach me at:
-
-- **GitHub**: [pdz1804](https://github.com/pdz1804)
-- **LinkedIn**: [Quang Phu Nguyen](https://www.linkedin.com/in/quangphunguyen/)
-- **Email**: [quangphunguyen1804@gmail.com](mailto:quangphunguyen1804@gmail.com)
-
-⭐️ Don't forget to star the repository if you like it!
-
----
+- **GitHub** — [pdz1804](https://github.com/pdz1804)
+- **LinkedIn** — [Quang Phu Nguyen](https://www.linkedin.com/in/quangphunguyen/)
+- **Email** — [quangphunguyen1804@gmail.com](mailto:quangphunguyen1804@gmail.com)
