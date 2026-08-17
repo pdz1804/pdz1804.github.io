@@ -128,8 +128,11 @@
     var f = mount('footer');
     if (!f) return;
     var year = new Date().getFullYear();
+    // projects.html has no #hero, so the name would be a dead anchor there.
+    var home = document.getElementById('hero') ? '#hero' : 'index.html#hero';
+
     f.innerHTML =
-      '<p class="footer-text">Designed &amp; built by <a href="#hero">' + D.profile.fullName +
+      '<p class="footer-text">Designed &amp; built by <a href="' + home + '">' + D.profile.fullName +
         '</a> · ' + D.profile.title + ' · ' + year + '</p>' +
       '<div class="footer-links">' +
         '<a href="' + D.profile.github + '" target="_blank" rel="noopener">GitHub</a>' +
@@ -179,7 +182,11 @@
 
     var card = mount('hero-card');
     if (card) {
-      var current = D.experience[0].roles[0];
+      // The open role, wherever it sits in the array — not simply the first.
+      var all = D.experience.reduce(function (acc, co) { return acc.concat(co.roles); }, []);
+      var current = all.filter(function (r) { return r.end === null; })
+                       .sort(function (a, b) { return (b.start || '').localeCompare(a.start || ''); })[0]
+                    || all[0];
       var rows = [
         ['Company',   D.profile.company],
         ['Focus',     'LLMs · RAG · Agents · MCP'],
@@ -259,7 +266,13 @@
           '<img src="' + co.logoLight + '" alt="' + co.company + '" class="exp-logo exp-logo-light">'
         : '<span class="exp-co-badge">' + (co.logoText || co.company.slice(0, 3).toUpperCase()) + '</span>';
 
-      var roles = co.roles.map(function (role, ri) {
+      // Newest first, so appending a promotion with push() lands it at the top
+    // rather than the bottom — the workflow data.js and the README document.
+    var ordered = co.roles.slice().sort(function (a, b) {
+      return (b.start || '').localeCompare(a.start || '');
+    });
+
+    var roles = ordered.map(function (role, ri) {
         var bullets = role.bullets.map(function (b) { return '<li>' + b + '</li>'; }).join('');
         var awards  = (role.awards || []).map(function (a) {
           return '<span class="award-tag">🏆 ' + a + '</span>';
@@ -427,7 +440,7 @@
     var el = mount('certifications');
     if (!el) return;
 
-    var sorted = D.certifications.slice().sort(function (a, b) { return b.year - a.year; });
+    var sorted = D.certifications.slice().sort(function (a, b) { return b.sortKey - a.sortKey; });
     var visible = D.certsVisible;
 
     function card(c, i, hidden) {

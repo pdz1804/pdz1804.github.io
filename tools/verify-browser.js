@@ -48,19 +48,37 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
 
   // --- Derived data ---
   const totals = await page.evaluate(() => window.PORTFOLIO_TOTALS);
-  check(totals.certs === 37, 'certifications count = 37', 'got ' + totals.certs);
-  check(totals.projects === 10, 'projects count = 10', 'got ' + totals.projects);
-  check(totals.years === 2, 'years experience = 2', 'got ' + totals.years);
+  const D = await page.evaluate(() => ({
+    certs: PORTFOLIO.certifications.length,
+    pro: PORTFOLIO.projects.professional.length,
+    acad: PORTFOLIO.projects.academic.length,
+    visible: PORTFOLIO.certsVisible,
+    skills: PORTFOLIO.skills.reduce((n, g) => n + g.items.length, 0),
+    repos: PORTFOLIO.projects.professional.filter(p => p.link).length +
+           PORTFOLIO.projects.academic.filter(p => p.link).length,
+    tenure: (() => {
+      const r = PORTFOLIO.experience[0].roles.map(x => x.start).sort()[0].split('-');
+      const n = new Date();
+      const m = (n.getFullYear() - +r[0]) * 12 + (n.getMonth() + 1 - +r[1]) + 1;
+      const y = Math.floor(m / 12), mm = m % 12, out = [];
+      if (y) out.push(y + ' yr' + (y > 1 ? 's' : ''));
+      if (mm) out.push(mm + ' mo' + (mm > 1 ? 's' : ''));
+      return out.join(' ');
+    })(),
+  }));
+  check(totals.certs === D.certs, 'certification count matches the data', `${totals.certs} rendered / ${D.certs} in data`);
+  check(totals.projects === D.pro + D.acad, 'project count matches the data', `${totals.projects} rendered / ${D.pro + D.acad} in data`);
+  check(totals.years >= 1, 'years of experience is computed', 'got ' + totals.years);
 
   const stats = await page.$$eval('.h-stat', (els) => els.map((e) => e.textContent.trim()));
-  check(stats.some((s) => s.startsWith('2+')), 'hero stat: 2+ years animated', stats.join(' | '));
-  check(stats.some((s) => s.startsWith('37')), 'hero stat: 37 certifications', stats.join(' | '));
-  check(stats.some((s) => s.startsWith('10')), 'hero stat: 10 projects', stats.join(' | '));
+  check(stats.some((s) => s.startsWith(totals.years + '+')), 'hero stat: years animated', stats.join(' | '));
+  check(stats.some((s) => s.startsWith(String(D.certs))), 'hero stat: certification count', stats.join(' | '));
+  check(stats.some((s) => s.startsWith(String(D.pro + D.acad))), 'hero stat: project count', stats.join(' | '));
   check(stats.some((s) => s.startsWith('3.8')), 'hero stat: 3.8 GPA', stats.join(' | '));
 
   // --- Tenure is computed, not stale ---
   const tenure = await page.$$eval('.exp-co-meta', (e) => e.map((x) => x.textContent));
-  check(/1 yr 3 mos/.test(tenure[0]), 'FPT tenure recomputed to 1 yr 3 mos', tenure[0]);
+  check(tenure[0].startsWith(D.tenure), 'FPT tenure matches the date math', `rendered "${tenure[0].split('·')[0].trim()}", computed "${D.tenure}"`);
   check(!/1 yr 1 mo\b/.test(tenure.join()), 'stale "1 yr 1 mo" is gone');
 
   // --- CV content sync ---
@@ -92,7 +110,7 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
   check(unrevealed === 0, 'all reveal elements shown after scrolling', unrevealed + ' left hidden');
 
   const barsFilled = await page.$$eval('.sk-fill', (els) => els.filter((b) => b.style.width && b.style.width !== '0%').length);
-  check(barsFilled === 36, 'all 36 skill bars filled', 'filled ' + barsFilled);
+  check(barsFilled === D.skills, 'every skill bar filled', `${barsFilled} of ${D.skills}`);
 
   // --- Hero rendering bugs that were fixed ---
   const hero = await page.evaluate(() => {
@@ -111,13 +129,13 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
   await page.waitForTimeout(400);
   const afterToggle = await page.$$eval('.cert-card', (e) => e.filter((c) => c.offsetParent !== null).length);
   const btnText = await page.textContent('#certs-more-btn');
-  check(beforeToggle === 12, 'certs collapsed shows 12', 'got ' + beforeToggle);
-  check(afterToggle === 37, 'certs expanded shows all 37', 'got ' + afterToggle);
+  check(beforeToggle === D.visible, 'certs collapsed shows certsVisible', `${beforeToggle} of ${D.visible}`);
+  check(afterToggle === D.certs, 'certs expanded shows them all', `${afterToggle} of ${D.certs}`);
   check(/fewer/i.test(btnText), 'toggle button label flips', btnText);
   await page.click('#certs-more-btn');
   await page.waitForTimeout(300);
   const reCollapsed = await page.$$eval('.cert-card', (e) => e.filter((c) => c.offsetParent !== null).length);
-  check(reCollapsed === 12, 'certs collapse again', 'got ' + reCollapsed);
+  check(reCollapsed === D.visible, 'certs collapse again', 'got ' + reCollapsed);
 
   // --- Theme toggle + persistence ---
   await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
@@ -206,10 +224,10 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
   const acadCount = await proj.$$eval('.acad-card', (e) => e.length);
   const projHidden = await proj.$$eval('.r', (e) => e.filter((x) => !x.classList.contains('on')).length);
   const projRepos = await proj.$$eval('.repo-link', (e) => e.map((a) => a.href));
-  check(proCount === 7, 'projects page: 7 professional cards', 'got ' + proCount);
-  check(acadCount === 3, 'projects page: 3 academic cards', 'got ' + acadCount);
+  check(proCount === D.pro, 'projects page: professional cards match data', `${proCount} of ${D.pro}`);
+  check(acadCount === D.acad, 'projects page: academic cards match data', `${acadCount} of ${D.acad}`);
   check(projHidden === 0, 'projects page: nothing left invisible', projHidden + ' hidden');
-  check(projRepos.length === 4, 'projects page: 4 repository links', projRepos.join(', '));
+  check(projRepos.length === D.repos, 'projects page: repository links match data', `${projRepos.length} of ${D.repos}`);
   check(projErrors.length === 0, 'projects page: no JS errors', projErrors.join(' | '));
   await proj.screenshot({ path: path.join(SHOTS, '06-projects-full.png'), fullPage: true });
 

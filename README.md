@@ -85,6 +85,11 @@ Conventions worth keeping:
   `SKILL_LEVELS` at the bottom of `data.js`.
 - A new certification issuer needs one entry in `certIssuers` for its badge and
   colour.
+- Certifications order by `sortKey`, an integer `YYYYMM` (e.g. `202606`). Don't
+  use a decimal like `2025.12` — it sorts *below* `2025.5`. The validator
+  rejects anything that isn't a valid year-month.
+- Roles render newest first by `start`, so `push()` on `roles[]` is safe; the
+  hero card shows whichever role has `end: null`, wherever it sits in the array.
 - `featured: true` on a professional project also surfaces it on the landing page.
 - Bullet strings accept inline HTML (`<strong>`, `<em>`) — write `&amp;` for a
   literal ampersand.

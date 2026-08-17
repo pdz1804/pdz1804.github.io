@@ -136,6 +136,18 @@ button { font-family: inherit; cursor: pointer; }
 }
 .skip-link:focus { left: 12px; }
 
+/* Shown only when scripting is off — the page renders its content from data.js,
+   so without JS there would otherwise be nothing but the nav and hero name. */
+.noscript-note {
+  position: relative; z-index: 1001;
+  margin: calc(var(--nav-h) + 16px) auto 0; max-width: var(--max-w);
+  padding: 18px 22px; border-radius: 12px;
+  background: var(--card); border: 1px solid var(--bdr);
+  color: var(--t-mid); font-size: 0.9375rem; line-height: 1.7;
+}
+.noscript-note strong { display: block; color: var(--t-high); margin-bottom: 4px; }
+.noscript-note a { color: var(--accent); font-weight: 600; }
+
 /* ── 3  LAYOUT PRIMITIVES ─────────────────────────────────────────────── */
 .wrap    { max-width: var(--max-w); margin: 0 auto; padding: var(--pad); }
 .section { padding: 96px 0; }
