@@ -441,56 +441,58 @@ const PORTFOLIO = {
   },
 
   /* ─── Certifications ────────────────────────────────────────────────────
-     `issuer` must match a key in certIssuers below. `year` drives sorting;
-     `date` is the label shown on the card.
+     `issuer` must match a key in certIssuers below. `sortKey` drives ordering
+     and is YYYYMM as an integer — a plain decimal breaks, because 2025.12 is
+     numerically below 2025.5. For an undated credential use a mid-year month
+     as the hint. `date` is the label shown on the card.
      ─────────────────────────────────────────────────────────────────────── */
   certifications: [
     // Anthropic — AI-Native Engineer track
-    { issuer: 'anthropic', name: 'Model Context Protocol: Advanced Topics', date: 'May 2026', year: 2026.05 },
-    { issuer: 'anthropic', name: 'AI Fluency: Framework & Foundations',     date: 'May 2026', year: 2026.05 },
-    { issuer: 'anthropic', name: 'Claude with Google Cloud\'s Vertex AI',   date: 'May 2026', year: 2026.05 },
-    { issuer: 'anthropic', name: 'AI Fluency for Small Businesses',         date: 'May 2026', year: 2026.05 },
-    { issuer: 'anthropic', name: 'Introduction to Subagents',               date: 'April 2026', year: 2026.04 },
-    { issuer: 'anthropic', name: 'Claude 101',                              date: 'April 2026', year: 2026.04 },
+    { issuer: 'anthropic', name: 'Model Context Protocol: Advanced Topics', date: 'May 2026', sortKey: 202605 },
+    { issuer: 'anthropic', name: 'AI Fluency: Framework & Foundations',     date: 'May 2026', sortKey: 202605 },
+    { issuer: 'anthropic', name: 'Claude with Google Cloud\'s Vertex AI',   date: 'May 2026', sortKey: 202605 },
+    { issuer: 'anthropic', name: 'AI Fluency for Small Businesses',         date: 'May 2026', sortKey: 202605 },
+    { issuer: 'anthropic', name: 'Introduction to Subagents',               date: 'April 2026', sortKey: 202604 },
+    { issuer: 'anthropic', name: 'Claude 101',                              date: 'April 2026', sortKey: 202604 },
 
     // Google
-    { issuer: 'google', name: 'Prompting Essentials',                       date: 'June 2026', year: 2026.06 },
-    { issuer: 'google', name: 'Use AI as a Creative or Expert Partner',     date: 'June 2026', year: 2026.06 },
-    { issuer: 'google', name: 'Design Prompts for Everyday Work Tasks',     date: 'June 2026', year: 2026.06 },
-    { issuer: 'google', name: 'Foundations of Data Science',                date: 'May 2026', year: 2026.05 },
-    { issuer: 'google', name: 'Google AI Specialization',                   date: 'February 2026', year: 2026.02 },
-    { issuer: 'google', name: 'AI Fundamentals',                            date: 'February 2026', year: 2026.02 },
-    { issuer: 'google', name: 'AI for Data Analysis',                       date: 'February 2026', year: 2026.02 },
-    { issuer: 'google', name: 'AI for App Building',                        date: 'February 2026', year: 2026.02 },
-    { issuer: 'google', name: 'AI for Research and Insights',               date: 'February 2026', year: 2026.02 },
-    { issuer: 'google', name: 'Gemini Certified University Student',        date: 'December 2025', year: 2025.12 },
+    { issuer: 'google', name: 'Prompting Essentials',                       date: 'June 2026', sortKey: 202606 },
+    { issuer: 'google', name: 'Use AI as a Creative or Expert Partner',     date: 'June 2026', sortKey: 202606 },
+    { issuer: 'google', name: 'Design Prompts for Everyday Work Tasks',     date: 'June 2026', sortKey: 202606 },
+    { issuer: 'google', name: 'Foundations of Data Science',                date: 'May 2026', sortKey: 202605 },
+    { issuer: 'google', name: 'Google AI Specialization',                   date: 'February 2026', sortKey: 202602 },
+    { issuer: 'google', name: 'AI Fundamentals',                            date: 'February 2026', sortKey: 202602 },
+    { issuer: 'google', name: 'AI for Data Analysis',                       date: 'February 2026', sortKey: 202602 },
+    { issuer: 'google', name: 'AI for App Building',                        date: 'February 2026', sortKey: 202602 },
+    { issuer: 'google', name: 'AI for Research and Insights',               date: 'February 2026', sortKey: 202602 },
+    { issuer: 'google', name: 'Gemini Certified University Student',        date: 'December 2025', sortKey: 202512 },
 
     // Google Cloud
-    { issuer: 'gcloud', name: 'Inspect Rich Documents with Gemini Multimodality & Multimodal RAG', date: '2025', year: 2025.5 },
-    { issuer: 'gcloud', name: 'Develop Gen AI Apps with Gemini and Streamlit', date: '2025', year: 2025.5 },
-    { issuer: 'gcloud', name: 'Prompt Design in Vertex AI',                    date: '2025', year: 2025.5 },
-    { issuer: 'gcloud', name: 'Automate Data Capture at Scale with Document AI', date: '2025', year: 2025.5 },
-    { issuer: 'gcloud', name: 'Gemini for Data Scientists and Analysts',       date: '2025', year: 2025.5 },
-    { issuer: 'gcloud', name: 'Responsible AI for Developers: Privacy & Safety', date: '2025', year: 2025.5 },
-    { issuer: 'gcloud', name: 'Intermediate ML: TensorFlow on Google Cloud',   date: '2025', year: 2025.5 },
+    { issuer: 'gcloud', name: 'Inspect Rich Documents with Gemini Multimodality & Multimodal RAG', date: '2025', sortKey: 202505 },
+    { issuer: 'gcloud', name: 'Develop Gen AI Apps with Gemini and Streamlit', date: '2025', sortKey: 202505 },
+    { issuer: 'gcloud', name: 'Prompt Design in Vertex AI',                    date: '2025', sortKey: 202505 },
+    { issuer: 'gcloud', name: 'Automate Data Capture at Scale with Document AI', date: '2025', sortKey: 202505 },
+    { issuer: 'gcloud', name: 'Gemini for Data Scientists and Analysts',       date: '2025', sortKey: 202505 },
+    { issuer: 'gcloud', name: 'Responsible AI for Developers: Privacy & Safety', date: '2025', sortKey: 202505 },
+    { issuer: 'gcloud', name: 'Intermediate ML: TensorFlow on Google Cloud',   date: '2025', sortKey: 202505 },
 
     // DeepLearning.AI
-    { issuer: 'dlai', name: 'Build AI Apps with MCP Server',                   date: '2025', year: 2025.4 },
-    { issuer: 'dlai', name: 'Knowledge Graphs for AI Agents: API Discovery',   date: '2025', year: 2025.4 },
-    { issuer: 'dlai', name: 'AI Agents in LangGraph',                          date: '2025', year: 2025.4 },
-    { issuer: 'dlai', name: 'Functions, Tools and Agents with LangChain',      date: '2025', year: 2025.4 },
-    { issuer: 'dlai', name: 'LangChain for LLM Application Development',       date: '2025', year: 2025.4 },
-    { issuer: 'dlai', name: 'LangChain: Chat with Your Data',                  date: '2025', year: 2025.4 },
-    { issuer: 'dlai', name: 'Reasoning with o1',                               date: '2025', year: 2025.4 },
-    { issuer: 'dlai', name: 'ChatGPT Prompt Engineering for Developers',       date: '2025', year: 2025.4 },
-    { issuer: 'dlai', name: 'Prompt Engineering with Llama 2 & 3',             date: '2025', year: 2025.4 },
+    { issuer: 'dlai', name: 'Build AI Apps with MCP Server',                   date: '2025', sortKey: 202504 },
+    { issuer: 'dlai', name: 'Knowledge Graphs for AI Agents: API Discovery',   date: '2025', sortKey: 202504 },
+    { issuer: 'dlai', name: 'AI Agents in LangGraph',                          date: '2025', sortKey: 202504 },
+    { issuer: 'dlai', name: 'Functions, Tools and Agents with LangChain',      date: '2025', sortKey: 202504 },
+    { issuer: 'dlai', name: 'LangChain for LLM Application Development',       date: '2025', sortKey: 202504 },
+    { issuer: 'dlai', name: 'LangChain: Chat with Your Data',                  date: '2025', sortKey: 202504 },
+    { issuer: 'dlai', name: 'Reasoning with o1',                               date: '2025', sortKey: 202504 },
+    { issuer: 'dlai', name: 'ChatGPT Prompt Engineering for Developers',       date: '2025', sortKey: 202504 },
+    { issuer: 'dlai', name: 'Prompt Engineering with Llama 2 & 3',             date: '2025', sortKey: 202504 },
 
     // Others
-    { issuer: 'datacamp',  name: 'AI Engineer for Data Scientists Associate',  date: 'September 2025', year: 2025.09 },
-    { issuer: 'hf',        name: 'AI Agents Fundamentals',                     date: 'June 2025', year: 2025.06 },
-    { issuer: 'aws',       name: 'Cloud Technology and Services Concepts',     date: '2025', year: 2025.3 },
-    { issuer: 'aws',       name: 'AWS Concepts',                               date: '2025', year: 2025.3 },
-    { issuer: 'microsoft', name: 'Office Specialist: Excel, Word & PowerPoint', date: '2016 / 2022', year: 2016 },
+    { issuer: 'datacamp',  name: 'AI Engineer for Data Scientists Associate',  date: 'September 2025', sortKey: 202509 },
+    { issuer: 'hf',        name: 'AI Agents Fundamentals',                     date: 'June 2025', sortKey: 202506 },
+    { issuer: 'aws',       name: 'Cloud Technology and Services Concepts',     date: '2025', sortKey: 202503 },
+    { issuer: 'aws',       name: 'AWS Concepts',                               date: '2025', sortKey: 202503 },
+    { issuer: 'microsoft', name: 'Office Specialist: Excel, Word & PowerPoint', date: '2016 / 2022', sortKey: 201601 },
   ],
 
   // How many certification cards show before the "Show all" toggle.

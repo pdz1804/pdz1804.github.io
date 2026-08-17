@@ -69,10 +69,13 @@
 
     var revealed = 0;
 
+    var pending = targets.length;
+
     function show(el) {
       if (el.classList.contains('on')) return;
       el.classList.add('on');
       revealed++;
+      pending--;
       $$('.sk-fill[data-w]', el).forEach(function (bar) {
         bar.style.width = bar.dataset.w + '%';
       });
@@ -98,8 +101,8 @@
     // The reveal is decoration; content must never be left invisible because of
     // it. Observer callbacks are delivered asynchronously and fast scrolling can
     // outrun them, so a throttled sweep of whatever is on screen backs it up.
-    // The listener detaches once everything has been shown.
-    var pending = targets.length;
+    // The listener detaches once everything has been shown — `pending` is
+    // decremented inside show(), so observer reveals count towards it too.
     var queued = false;
 
     // Reveals anything the reader has reached *or scrolled past*, not just what
@@ -109,7 +112,7 @@
       queued = false;
       targets.forEach(function (el) {
         if (el.classList.contains('on')) return;
-        if (el.getBoundingClientRect().top < window.innerHeight) { show(el); pending--; }
+        if (el.getBoundingClientRect().top < window.innerHeight) show(el);
       });
       if (pending <= 0) window.removeEventListener('scroll', onScroll);
     }
@@ -306,6 +309,12 @@
       W = cv.width  = cv.offsetWidth;
       H = cv.height = cv.offsetHeight;
       if (!pts.length) return;
+      // Pull survivors back inside the new bounds; a point left outside would
+      // otherwise sit off-canvas for the rest of the session.
+      pts.forEach(function (p) {
+        p.x = Math.min(Math.max(p.x, 0), W);
+        p.y = Math.min(Math.max(p.y, 0), H);
+      });
       var want = targetCount();
       while (pts.length > want) pts.pop();
       while (pts.length < want) pts.push(makePoint());
@@ -329,8 +338,10 @@
         var d = Math.sqrt(dx * dx + dy * dy);
         if (d < 80 && d > 0) { p.x += dx / d * 0.5; p.y += dy / d * 0.5; }
       }
-      if (p.x < 0 || p.x > W) p.vx *= -1;
-      if (p.y < 0 || p.y > H) p.vy *= -1;
+      // Reflect only when travelling outward. Flipping on position alone leaves
+      // a point stranded outside the canvas after a shrink oscillating forever.
+      if ((p.x < 0 && p.vx < 0) || (p.x > W && p.vx > 0)) p.vx *= -1;
+      if ((p.y < 0 && p.vy < 0) || (p.y > H && p.vy > 0)) p.vy *= -1;
     }
 
     function frame() {

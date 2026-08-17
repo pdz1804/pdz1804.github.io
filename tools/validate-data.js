@@ -138,7 +138,12 @@ D.certifications.forEach((c, i) => {
   if (!(c.issuer in D.certIssuers)) {
     fail(`${w}: issuer "${c.issuer}" has no entry in certIssuers`);
   }
-  if (typeof c.year !== 'number') fail(`${w}: year must be a number (it drives sorting)`);
+  // YYYYMM as an integer. A decimal such as 2025.12 sorts below 2025.5, which
+  // silently buries December entries — so the shape is enforced, not just the type.
+  if (!Number.isInteger(c.sortKey) || c.sortKey < 190001 || c.sortKey > 999912 ||
+      c.sortKey % 100 < 1 || c.sortKey % 100 > 12) {
+    fail(`${w}: sortKey must be an integer YYYYMM (got ${c.sortKey})`);
+  }
   const key = c.issuer + '|' + c.name;
   if (seenCerts.has(key)) warn(`${w}: duplicate certification`);
   seenCerts.add(key);
