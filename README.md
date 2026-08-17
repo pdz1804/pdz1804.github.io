@@ -33,8 +33,10 @@ assets/
   cv/                   downloadable CV (phone-free build — see below)
 images/                 profile photo and company logos
 icons/                  favicons and PWA icons
-tools/validate-data.js  data integrity check
-tools/verify-browser.js opt-in Playwright verification suite
+tools/validate-data.js       data integrity check
+tools/verify-browser.js      opt-in Playwright verification suite
+tools/verify-devices.js      device matrix and touch-target check
+tools/verify-sw-eviction.js  service-worker eviction check
 docs/screenshots/       development screenshots (not served content)
 ```
 
@@ -72,6 +74,19 @@ of the site; install it only when you want to run it:
 python -m http.server 8099          # separate terminal, repo root
 npm install --no-save playwright
 node tools/verify-browser.js        # 67 checks, screenshots in tools/shots/
+```
+
+Two narrower suites sit alongside it:
+
+```sh
+# Six device profiles, portrait and landscape, touch input, 44px tap targets
+TARGET=http://127.0.0.1:8099 node tools/verify-devices.js
+
+# Proves a returning visitor's cached service worker is evicted after a deploy
+git worktree add --detach .swtest-old 9b18675
+mkdir .swtest-new && git archive HEAD | tar -x -C .swtest-new
+node tools/verify-sw-eviction.js
+git worktree remove --force .swtest-old && rm -rf .swtest-new
 ```
 
 Conventions worth keeping:
