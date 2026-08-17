@@ -1,50 +1,50 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Single Page Apps for GitHub Pages</title>
-    <script type="text/javascript">
-      // Single Page Apps for GitHub Pages
-      // MIT License
-      // https://github.com/rafgraph/spa-github-pages
-      // This script takes the current url and converts the path and query
-      // string into just a query string, and then redirects the browser
-      // to the new url with only a query string and hash fragment,
-      // e.g. https://www.foo.tld/one/two?a=b&c=d#qwe, becomes
-      // https://www.foo.tld/?/one/two&a=b~and~c=d#qwe
-      // Note: this 404.html file must be at least 512 bytes for it to work
-      // with Internet Explorer (it is currently > 512 bytes)
-
-      // If you're creating a Project Pages site and NOT using a custom domain,
-      // then set pathSegmentsToKeep to 1 (enterprise users may need to set it to > 1).
-      // This way the code will only replace the route part of the path, and not
-      // the real directory in which the app resides, for example:
-      // https://username.github.io/repo-name/one/two?a=b&c=d#qwe becomes
-      // https://username.github.io/repo-name/?/one/two&a=b~and~c=d#qwe
-      // Otherwise, leave pathSegmentsToKeep as 0.
-      var pathSegmentsToKeep = 0;
-
-      var l = window.location;
-      l.replace(
-        l.protocol +
-          "//" +
-          l.hostname +
-          (l.port ? ":" + l.port : "") +
-          l.pathname
-            .split("/")
-            .slice(0, 1 + pathSegmentsToKeep)
-            .join("/") +
-          "/?/" +
-          l.pathname
-            .slice(1)
-            .split("/")
-            .slice(pathSegmentsToKeep)
-            .join("/")
-            .replace(/&/g, "~and~") +
-          (l.search ? "&" + l.search.slice(1).replace(/&/g, "~and~") : "") +
-          l.hash
-      );
-    </script>
-  </head>
-  <body></body>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page not found — Phu Nguyen</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/main.css">
+<style>
+  .nf {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    gap: 20px; padding: 40px 24px; background: var(--bg-0);
+  }
+  .nf-code {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 14vw, 8rem); font-weight: 800;
+    line-height: 1; letter-spacing: -0.05em;
+    background: linear-gradient(135deg, var(--accent), var(--ok));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .nf-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--t-high); }
+  .nf-sub   { color: var(--t-mid); max-width: 44ch; }
+</style>
+<script>
+(function () {
+  var saved;
+  try { saved = localStorage.getItem('nqp-theme'); } catch (e) {}
+  var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  document.documentElement.setAttribute('data-theme', saved || (prefersLight ? 'light' : 'dark'));
+})();
+</script>
+</head>
+<body>
+  <main class="nf">
+    <div class="nf-code">404</div>
+    <h1 class="nf-title">This page doesn't exist</h1>
+    <p class="nf-sub">The link may be out of date, or the page may have moved. The portfolio and the full project list are both still here.</p>
+    <div class="cta-row">
+      <a href="/" class="btn-primary">Back to portfolio</a>
+      <a href="/projects.html" class="btn-ghost">View all projects</a>
+    </div>
+  </main>
+</body>
 </html>
