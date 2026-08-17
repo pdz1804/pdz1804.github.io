@@ -1,0 +1,41 @@
+# Portfolio — working notes
+
+Static site for <https://pdz1804.github.io/>. No framework, no build step, no
+dependencies. This repo *is* the live URL (GitHub Pages user site).
+
+**Read `docs/HANDOFF.md` before changing anything** — it carries the current
+state, the decisions already made and the traps that have already caused bugs.
+
+## The one rule
+
+All content lives in `assets/js/data.js`. Counts, card numbering, animation
+delays, company tenure and the "Show all N certifications" button derive from it.
+Adding a project or a certification means editing one array — if you are editing
+HTML to add content, stop and re-read the handoff.
+
+Run `node tools/validate-data.js` after any content edit. No dependencies, exits
+non-zero on error.
+
+## Invariants
+
+- `sortKey` on certifications is an integer `YYYYMM`, never a decimal.
+- `end: null` marks the current role; exactly one should have it. Roles render
+  newest-first, so `push()` is safe.
+- Skill bar widths come from `level` via `SKILL_LEVELS`, never a hand-tuned
+  percentage.
+- Every colour is a token. The light theme redefines tokens only — no
+  `[data-theme=…] .component` rules.
+- **Do not delete `service-worker.js`.** It is a tombstone that unregisters the
+  old Workbox worker still installed in returning visitors' browsers.
+
+## Verifying
+
+```sh
+node tools/validate-data.js                                     # always
+npm install --no-save playwright                                # for the rest
+node tools/verify-browser.js                                    # 67 checks
+TARGET=https://pdz1804.github.io node tools/verify-devices.js   # 90 checks
+```
+
+Content source of truth is `D:\Personal\CV` (`CV_full` and `CV_2page`), last
+synced 17 Aug 2026. Its `CV_README.md` content rules apply here too.
