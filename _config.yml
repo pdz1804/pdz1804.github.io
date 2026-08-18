@@ -1,0 +1,13 @@
+# GitHub Pages runs Jekyll over this repository. The site itself is plain static
+# files and uses none of Jekyll's features — this config exists only to keep
+# working documents and dev tooling out of the *published* site. They stay in
+# the repository, they just stop being fetchable at pdz1804.github.io.
+#
+# Jekyll already omits dotfiles and anything prefixed with an underscore, which
+# is why docs/screenshots/_*.png were never served.
+exclude:
+  - CLAUDE.md
+  - README.md
+  - docs/
+  - tools/
+  - .gitignore
