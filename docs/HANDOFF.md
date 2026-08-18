@@ -61,9 +61,9 @@ These are written down because each one has already caused a bug here.
 
 Revisit these only with a reason; each was a deliberate call.
 
-- **Contact address is Gmail, not `phunq15@fpt.com`.** A public job-seeking site
-  should not route enquiries to the current employer's inbox. One line in
-  `data.js` if that changes.
+- **Contact address is the personal Gmail, not the FPT work address.** A public
+  job-seeking site should not route enquiries to the current employer's inbox.
+  One line in `data.js` if that changes.
 - **The published CV is a phone-free rebuild.** `assets/cv/…_CV.pdf` is built
   from `CV_2page` with the `(+84) …` header fragment removed, because a
   crawlable page should not carry a mobile number. Regeneration steps are in the

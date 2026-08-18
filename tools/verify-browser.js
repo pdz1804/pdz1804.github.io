@@ -88,7 +88,9 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
                       'Model Context Protocol', 'Jun – Oct 2025']) {
     check(body.includes(term), 'content present: ' + term);
   }
-  check(!body.includes('phunq15@fpt.com'), 'work email removed from public site');
+  // Any employer address, not one literal — broader, and keeps the address
+  // itself out of this public repository.
+  check(!/@fpt\.com/i.test(body), 'no work email on the public site');
   check(body.includes('quangphunguyen1804@gmail.com'), 'gmail contact present');
 
   // --- Reveal actually fires (nothing left invisible) ---
