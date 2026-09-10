@@ -83,11 +83,15 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
 
   // --- CV content sync ---
   const body = await page.evaluate(() => document.body.innerText);
-  for (const term of ['Agentic ERP Platform', 'MCP', 'Prysm Portal', 'AI4ALL',
+  for (const term of ['Agentic ERP Platform', 'Management Portal', 'AI4ALL',
                       'Graduated — Excellent classification', 'OISP Scholarship',
-                      'Model Context Protocol', 'Jun – Oct 2025']) {
+                      'permission layer', 'Jun – Oct 2025']) {
     check(body.includes(term), 'content present: ' + term);
   }
+  // Client / product names that must never appear on the public site.
+  check(!/(prysm|nuskin|hillspire|aperium)/i.test(body),
+        'no forbidden client or product names',
+        (body.match(/(prysm|nuskin|hillspire|aperium)/i) || ['none'])[0]);
   // Any employer address, not one literal — broader, and keeps the address
   // itself out of this public repository.
   check(!/@fpt\.com/i.test(body), 'no work email on the public site');

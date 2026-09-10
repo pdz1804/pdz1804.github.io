@@ -18,6 +18,9 @@ non-zero on error.
 
 ## Invariants
 
+- **Never name `NuSkin`, `Hillspire`, `Aperium` or `Prysm`** anywhere on the
+  site. Use "Agentic ERP Platform", "wellness enterprise client", "Management
+  Portal". `tools/verify-browser.js` fails on any of the four.
 - `sortKey` on certifications is an integer `YYYYMM`, never a decimal.
 - `end: null` marks the current role; exactly one should have it. Roles render
   newest-first, so `push()` is safe.
@@ -37,5 +40,6 @@ node tools/verify-browser.js                                    # 67 checks
 TARGET=https://pdz1804.github.io node tools/verify-devices.js   # 90 checks
 ```
 
-Content source of truth is `D:\Personal\CV` (`CV_full` and `CV_2page`), last
-synced 17 Aug 2026. Its `CV_README.md` content rules apply here too.
+Content source of truth is `D:\Personal\CV` — the authoritative file is
+`input/profile_context_2026_09_10.md`, with `CV_full` and `CV_2page` derived
+from it. Last synced 11 Sep 2026. Its `CV_README.md` content rules apply here too.
