@@ -1,6 +1,6 @@
 # Handoff
 
-State of this repo as of **11 September 2026**, deployed commit `6624036`.
+State of this repo as of **11 September 2026**, deployed commit `b85ada2`.
 
 Live at <https://pdz1804.github.io/> — a GitHub Pages *user* site, so this repo
 **is** that URL. There is no separate deployment.
@@ -19,7 +19,7 @@ af813bd  chore: remove Create React App build output
 4656a77  fix: meet the 44px touch-target minimum on mobile controls
 f99719c  docs: add handoff context
 f12be25  fix: keep working documents out of the published site
-6624036  content: sync portfolio with the September 2026 CV            ← live
+b85ada2  content: sync portfolio with the September 2026 CV            ← live
 ```
 
 Verification at the time of handoff, all against the live site:
