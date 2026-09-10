@@ -11,10 +11,9 @@
    D:\Personal\CV — `input/profile_context_2026_09_10.md` plus the two derived
    CVs (`CV_full/`, `CV_2page/`). Last synced 11 Sep 2026.
 
-   NEVER name these clients / products anywhere on the site:
-   `NuSkin`, `Hillspire`, `Aperium`, `Prysm`. Use "Agentic ERP Platform",
-   "wellness enterprise client", "Management Portal". verify-browser.js enforces
-   this.
+   NEVER name the four clients / products listed in D:\Personal\CV\CV_README.md
+   anywhere on the site. Use "Agentic ERP Platform", "wellness enterprise
+   client", "Management Portal". tools/verify-browser.js enforces this.
 
    HOW TO ADD THINGS
    -----------------
