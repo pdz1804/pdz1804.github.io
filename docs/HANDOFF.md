@@ -1,6 +1,6 @@
 # Handoff
 
-State of this repo as of **17 August 2026**, deployed commit `4656a77`.
+State of this repo as of **11 September 2026**, deployed commit `6624036`.
 
 Live at <https://pdz1804.github.io/> — a GitHub Pages *user* site, so this repo
 **is** that URL. There is no separate deployment.
@@ -9,14 +9,17 @@ Live at <https://pdz1804.github.io/> — a GitHub Pages *user* site, so this rep
 
 The site was rebuilt from a Create React App leftover into a hand-written static
 site that renders itself from one content file. Content is synced with the CV in
-`D:\Personal\CV` as of 17 Aug 2026. Everything mechanically checkable has been
-verified against the live host.
+`D:\Personal\CV` as of **11 Sep 2026** — see *Content source of truth* below for
+what changed in that sync.
 
 ```
 af813bd  chore: remove Create React App build output
 6c779ac  refactor: rebuild site as data-driven static pages
 9d872b4  fix: correct certification ordering and role-append handling
-4656a77  fix: meet the 44px touch-target minimum on mobile controls   ← live
+4656a77  fix: meet the 44px touch-target minimum on mobile controls
+f99719c  docs: add handoff context
+f12be25  fix: keep working documents out of the published site
+6624036  content: sync portfolio with the September 2026 CV            ← live
 ```
 
 Verification at the time of handoff, all against the live site:
@@ -26,7 +29,7 @@ Verification at the time of handoff, all against the live site:
 | `tools/verify-browser.js` | 67/67 |
 | `tools/verify-devices.js` | 90/90 |
 | `tools/verify-sw-eviction.js` | 10/10 |
-| `tools/validate-data.js` | passes |
+| `tools/validate-data.js` | passes (2 companies · 3 roles · 48 skills · 10 projects · 37 certs) |
 
 ## The one rule
 
@@ -39,8 +42,14 @@ catches the mistakes an edit realistically introduces.
 
 ## Invariants that are easy to break
 
-These are written down because each one has already caused a bug here.
+These are written down because each one has already caused a bug or a compliance
+slip here.
 
+- **Never name these clients or products anywhere on the site:** `NuSkin`,
+  `Hillspire`, `Aperium`, `Prysm`. The CV content rules forbid them; use "Agentic
+  ERP Platform", "wellness enterprise client", "Management Portal". The August
+  build shipped "Prysm Portal" — the Sep sync renamed it. `verify-browser.js` now
+  fails on any of the four.
 - **`sortKey` is an integer `YYYYMM`, never a decimal.** This originally shipped
   as `year: 2025.12`, which sorts *below* `2025.5` — December 2025 was buried at
   position 33 of 37. The validator now rejects malformed keys.
@@ -69,8 +78,11 @@ Revisit these only with a reason; each was a deliberate call.
   crawlable page should not carry a mobile number. Regeneration steps are in the
   README. The source in `D:\Personal\CV` is untouched and still has the phone.
 - **The landing page shows featured *professional* projects**, not academic
-  coursework. With seven professional projects, leading on coursework undersold
-  the work. Controlled by `featured: true`.
+  coursework. Controlled by `featured: true` — currently Agentic ERP Platform,
+  Healthcare Chatbot & Management Portal, M3ARAG.
+- **`typedRoles` / `tagline` lead on agentic-platform work**, not the old
+  "MCP integrations" framing, because that is what the current role actually is
+  (see the source-of-truth note below).
 - **`twitter:card` is `summary`** (small square, uses the portrait). A wide
   1200×630 card was never made — if you want a large banner preview, that is the
   outstanding task.
@@ -79,15 +91,40 @@ Revisit these only with a reason; each was a deliberate call.
 
 ## Content source of truth
 
-`D:\Personal\CV\CV_full\CV_full.tex` and `CV_2page\CV_2page.tex`, last synced
-17 Aug 2026. `CV_README.md` in that folder carries content rules that apply here
-too — notably: the June 2026 platform is referred to **only** as the *Agentic ERP
-Platform*, never its internal name; education reads *graduated*, never
-"expected"; no proposal or presales content.
+`D:\Personal\CV` — the authoritative file is now
+**`input/profile_context_2026_09_10.md`** (the long-form profile supplied
+2026-09-10), with `CV_full/CV_full.tex` and `CV_2page/CV_2page.tex` derived from
+it. `Latest_Quang_Phu_Nguyen_CV.md` and older `input/`/`output/` files are stale.
 
-Note the two CVs differ slightly. `CV_full` lists two personal projects,
-`CV_2page` lists three (it keeps *Detect AI-generated Text*). The site follows
-the 2-page version.
+`CV_README.md` in that folder carries content rules that apply here too:
+never name the four clients/products above; work bullets newest→oldest; no dates
+inside bullet text; education reads *graduated*, never "expected"; no proposal or
+presales content; keep project-heading tech lists short.
+
+**What the 2026-09 sync changed on the site** (baseline was the Aug 2026 build):
+
+- **Agentic ERP Platform** — the Aug description ("Odoo / NetSuite connectors,
+  MCP integrations, Slack / Jira / Confluence, query pushdown") was a guess and
+  was wrong. The real project is an **enterprise AI workspace** where agents act
+  inside a company's own systems: agent runtime, default-deny permission layer,
+  multi-tenant admin with audit trail, user-authored Skills, Artifacts,
+  Automations, plugin system. Team of 15.
+- **Healthcare Agentic Chatbot & Management Portal** — role period is now
+  **Nov 2025 – May 2026** (ended), was "Nov 2025 – Present". "Prysm Portal"
+  renamed to "Management Portal".
+- **Blog System** — team of 2, was "team of 4".
+- **Detect AI-generated Text** — now links
+  `github.com/Frankie2030/PIProject-detect-ai-essay`.
+- **Skills** — 7 groups / 36 items → **8 groups / 48 items**; adds Google Cloud,
+  Temporal, LangGraph, PEFT/LoRA, Sentence-Transformers, spaCy/NLTK/Gensim,
+  ArgoCD, and a new **Observability & Quality** group (OpenTelemetry, Prometheus,
+  Sentry, Arize Phoenix, SonarQube, Backstage, W&B). Dropped "vLLM / Cohere
+  Rerank" — not in the authoritative profile.
+- **Certifications** — unchanged. The 37-entry list already matches the fuller
+  LinkedIn-derived list `CV_full` uses; the profile context's cert section is an
+  acknowledged subset.
+- **Role title** stays "Associate AI Engineer" — the profile's open-questions
+  note says to keep it until the user confirms otherwise.
 
 ## Gotchas discovered the hard way
 
@@ -113,6 +150,9 @@ Worth reading before debugging something that looks broken.
   at 44px minimum, but that is geometry, not ergonomics.
 - **Optionally a 1200×630 social card**, if a large link preview matters.
 - **Eventually remove the service-worker tombstone** (see above).
+- **A `README.md` overhaul is being drafted separately** — the *GitHub profile*
+  README at `github.com/pdz1804/pdz1804`, not this repo's README. Local draft
+  first, push only on approval.
 
 ## Verifying after a change
 
