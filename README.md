@@ -31,7 +31,7 @@ assets/
   js/render.js          data → DOM
   js/ui.js              theme, nav, reveal, canvas, counters, tilt
   cv/                   downloadable CV (phone-free build — see below)
-images/                 profile photo and company logos
+images/                 profile photo, company logos, evidence/ (certificate images)
 icons/                  favicons and PWA icons
 tools/validate-data.js       data integrity check
 tools/verify-browser.js      opt-in Playwright verification suite
