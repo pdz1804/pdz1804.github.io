@@ -18,8 +18,9 @@ non-zero on error.
 
 ## Invariants
 
-- Evidence images (`images/evidence/`) must never show a client or product name from
-  the list below. Honors and role evidence are declared in `data.js` (`honors[]`,
+- Evidence images (`images/evidence/`) should not show a client or product name from
+  the list below; the only exception is `best-team-certificate.jpg`, kept by the
+  owner's explicit decision (its file name, alt and caption stay clean). Honors and role evidence are declared in `data.js` (`honors[]`,
   `roles[].evidence`).
 - **Never name `NuSkin`, `Hillspire`, `Aperium` or `Prysm`** anywhere on the
   site. Use "Agentic ERP Platform", "wellness enterprise client", "Management
