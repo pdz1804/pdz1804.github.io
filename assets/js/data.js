@@ -154,6 +154,11 @@ const PORTFOLIO = {
               alt:     'FPT Software AI1 Young Talent Certificate of Recognition Level 3, with the Great Job medal and 1,500 Gold',
               caption: 'AI1 Young Talent — Certificate of Recognition Level 3 (FSOFT)',
             },
+            {
+              src:     'images/evidence/best-team-certificate.jpg',
+              alt:     'FPT Software Certificate of Recognition: complete project with outstanding quality and progress',
+              caption: 'Certificate of Recognition — outstanding quality and progress (Dec 2025)',
+            },
           ],
         },
         {
@@ -328,7 +333,9 @@ const PORTFOLIO = {
   /* ─── Honors & awards ───────────────────────────────────────────────────
      Professional and competition recognition, each with its evidence image
      (files in images/evidence/). `sortKey` is an integer YYYYMM, newest first.
-     Do not add an image that shows a client or product name from the CV rules. */
+     Keep client and product names out of every text field. Exception, by the
+     owner's explicit decision on 2026-09-30: best-team-certificate.jpg shows a
+     client name on its face; its file name, alt text and caption do not. */
   honors: [
     {
       title:   'Top 10 — AI Riser Vietnam 2026',
@@ -361,6 +368,23 @@ const PORTFOLIO = {
           src:     'images/evidence/ai1-young-talent-certificate.jpg',
           alt:     'FPT Software AI1 Young Talent Certificate of Recognition Level 3',
           caption: 'AI1 Young Talent — Certificate of Recognition Level 3 (FSOFT)',
+        },
+      ],
+    },
+    {
+      title:   '"Best Team" Award — Certificate of Recognition',
+      issuer:  'FPT Software · FPT Americas (ST25)',
+      date:    'Dec 2025',
+      sortKey: 202512,
+      description:
+        'Recognised with the team for <strong>completing the project with outstanding quality and progress</strong>: ' +
+        'a healthcare agentic chatbot taken from Proof of Concept to production in six months. Digitally signed by ' +
+        'Mr. Tam Nguyen Thanh, Vice Business Unit Leader of AI1 SDU.',
+      evidence: [
+        {
+          src:     'images/evidence/best-team-certificate.jpg',
+          alt:     'FPT Software Certificate of Recognition: complete project with outstanding quality and progress',
+          caption: 'Certificate of Recognition — outstanding quality and progress (Dec 2025)',
         },
       ],
     },

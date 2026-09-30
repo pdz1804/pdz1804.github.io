@@ -80,9 +80,12 @@ The site now shows proof, not just claims. Two content shapes carry it, both dri
 - An evidence entry is `{ src, alt, caption }`; files live in `images/evidence/` and open
   full size in a new tab. `renderHonors()` and `evidenceLinks()` in `render.js` do the work.
 
-**Do not add an evidence image that shows a client or product name** from the CV content
-rules. The older FSoft "Complete project with outstanding quality and progress" certificate
-(on LinkedIn) has one on its face, so it is deliberately absent here.
+**Client and product names stay out of every text field** (title, description, caption, alt,
+file name). One deliberate exception: on 2026-09-30 the owner explicitly asked for the FSoft
+"Complete project with outstanding quality and progress" certificate
+(`images/evidence/best-team-certificate.jpg`), which shows a client name on its face. Its
+file name, alt text and caption are clean. Do not add other name-bearing images without
+the same explicit say-so.
 
 `validate-data.js` checks that every `evidence.src` exists; `verify-browser.js` checks card
 counts and that every evidence image actually loads (76 checks now).
