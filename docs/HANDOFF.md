@@ -1,6 +1,8 @@
 # Handoff
 
-State of this repo as of **11 September 2026**, deployed commit `b85ada2`.
+State of this repo as of **30 September 2026**. Content synced with the 2026-09-30 CV
+(honors, evidence images, role title). The 11 September history below is still accurate
+for everything not mentioned in *Evidence images and honors*.
 
 Live at <https://pdz1804.github.io/> — a GitHub Pages *user* site, so this repo
 **is** that URL. There is no separate deployment.
@@ -66,6 +68,25 @@ slip here.
   navigations from its cache; deleting the file strands them on the old site
   permanently. It can go once that traffic has aged out — say mid-2027.
 
+## Evidence images and honors (added 2026-09-30)
+
+The site now shows proof, not just claims. Two content shapes carry it, both driven by
+`data.js`:
+
+- `honors[]` renders the **Honors & Awards** section (`#honors`, nav entry "Honors").
+  Each honor has `title`, `issuer`, `date`, integer `sortKey` (YYYYMM), `description` and
+  an `evidence[]` list.
+- `evidence[]` may also sit on a **role** (`experience[].roles[]`), shown under its bullets.
+- An evidence entry is `{ src, alt, caption }`; files live in `images/evidence/` and open
+  full size in a new tab. `renderHonors()` and `evidenceLinks()` in `render.js` do the work.
+
+**Do not add an evidence image that shows a client or product name** from the CV content
+rules. The older FSoft "Complete project with outstanding quality and progress" certificate
+(on LinkedIn) has one on its face, so it is deliberately absent here.
+
+`validate-data.js` checks that every `evidence.src` exists; `verify-browser.js` checks card
+counts and that every evidence image actually loads (76 checks now).
+
 ## Decisions already made
 
 Revisit these only with a reason; each was a deliberate call.
@@ -123,8 +144,9 @@ presales content; keep project-heading tech lists short.
 - **Certifications** — unchanged. The 37-entry list already matches the fuller
   LinkedIn-derived list `CV_full` uses; the profile context's cert section is an
   acknowledged subset.
-- **Role title** stays "Associate AI Engineer" — the profile's open-questions
-  note says to keep it until the user confirms otherwise.
+- **Role title** — *superseded 2026-09-30:* the user chose **"AI Engineer" for the whole
+  Nov 2025 – Present** role (one entry). LinkedIn still shows the Associate → AI Engineer
+  split; the CV and this site intentionally do not.
 
 ## Gotchas discovered the hard way
 

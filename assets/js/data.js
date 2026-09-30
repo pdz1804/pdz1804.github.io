@@ -9,7 +9,7 @@
    CONTENT SOURCE OF TRUTH
    ----------------------
    D:\Personal\CV — `input/profile_context_2026_09_10.md` plus the two derived
-   CVs (`CV_full/`, `CV_2page/`). Last synced 11 Sep 2026.
+   CVs (`CV_full/`, `CV_2page/`). Last synced 30 Sep 2026.
 
    NEVER name the four clients / products listed in D:\Personal\CV\CV_README.md
    anywhere on the site. Use "Agentic ERP Platform", "wellness enterprise
@@ -26,6 +26,8 @@
    New certification .... push onto certifications[]. The hero counter and the
                           "Show all N" button update themselves. A new issuer
                           needs one entry in certIssuers below.
+   New honor / award .... push onto honors[] with an `evidence` image in
+                          images/evidence/. A role can carry `evidence` too.
    New degree ........... push onto education[].
    New skill ............ push onto the matching group's items[].
                           Bar width comes from `level`, never a magic number.
@@ -126,7 +128,7 @@ const PORTFOLIO = {
       logoLight: 'images/fpt-logo-dark.png',
       roles: [
         {
-          title:      'Associate AI Engineer',
+          title:      'AI Engineer',
           type:       'Full-time',
           period:     'Nov 2025 – Present',
           start:      '2025-11',
@@ -143,6 +145,15 @@ const PORTFOLIO = {
           ],
           awards: [
             '"Best Team" Award — FPT Americas (ST25): recognised for excellence in delivery, innovation, quality and progress',
+            'AI1 Young Talent — Certificate of Recognition Level 3 (FSOFT), Great Job medal and 1,500 Gold from Mr. Tam Nguyen Thanh, Vice Business Unit Leader of AI1 SDU',
+          ],
+          // Proof shown under the role. Files live in images/evidence/.
+          evidence: [
+            {
+              src:     'images/evidence/ai1-young-talent-certificate.jpg',
+              alt:     'FPT Software AI1 Young Talent Certificate of Recognition Level 3, with the Great Job medal and 1,500 Gold',
+              caption: 'AI1 Young Talent — Certificate of Recognition Level 3 (FSOFT)',
+            },
           ],
         },
         {
@@ -311,6 +322,47 @@ const PORTFOLIO = {
         'Strong foundation in analytical & quantitative reasoning',
       ],
       gpa: null,
+    },
+  ],
+
+  /* ─── Honors & awards ───────────────────────────────────────────────────
+     Professional and competition recognition, each with its evidence image
+     (files in images/evidence/). `sortKey` is an integer YYYYMM, newest first.
+     Do not add an image that shows a client or product name from the CV rules. */
+  honors: [
+    {
+      title:   'Top 10 — AI Riser Vietnam 2026',
+      issuer:  'Google for Developers · #BuildwithGoogleAI',
+      date:    'Sep 2026',
+      sortKey: 202609,
+      description:
+        'Selected as a Top 10 team for <strong>Sách Của Em</strong>, a teacher studio that turns photos of ' +
+        'textbook pages into printable, curriculum-cited lessons for Vietnamese primary-school teachers, built ' +
+        'end to end on Google technology. Invited to present at the AI Riser Demo Day at GEM Center, Ho Chi Minh City.',
+      evidence: [
+        {
+          src:     'images/evidence/ai-riser-vietnam-2026-top-10.jpg',
+          alt:     'Google for Developers AI Riser Vietnam 2026 Top 10 Certificate of Completion',
+          caption: 'AI Riser Vietnam 2026 — Top 10 Certificate of Completion',
+        },
+      ],
+    },
+    {
+      title:   'AI1 Young Talent — Certificate of Recognition, Level 3 (FSOFT)',
+      issuer:  'FPT Software',
+      date:    'Sep 2026',
+      sortKey: 202609,
+      description:
+        'Awarded by <strong>Mr. Tam Nguyen Thanh</strong>, Vice Business Unit Leader of AI1 SDU, with the Great Job ' +
+        'medal and 1,500 Gold for achieving the quarterly business plan and for the positive attitude and team ' +
+        'spirit brought to team activities.',
+      evidence: [
+        {
+          src:     'images/evidence/ai1-young-talent-certificate.jpg',
+          alt:     'FPT Software AI1 Young Talent Certificate of Recognition Level 3',
+          caption: 'AI1 Young Talent — Certificate of Recognition Level 3 (FSOFT)',
+        },
+      ],
     },
   ],
 
@@ -545,6 +597,7 @@ const PORTFOLIO = {
     { label: 'Experience', href: '#experience' },
     { label: 'Skills',     href: '#skills' },
     { label: 'Education',  href: '#education' },
+    { label: 'Honors',     href: '#honors' },
     { label: 'Projects',   href: '#projects' },
     { label: 'Certs',      href: '#certifications' },
   ],

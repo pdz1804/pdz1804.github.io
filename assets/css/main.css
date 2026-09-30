@@ -661,6 +661,51 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--ok); background: var(--ok-soft); border: 1px solid var(--ok-bdr);
 }
 
+/* ── 9b  EVIDENCE + HONORS ────────────────────────────────────────────── */
+/* Certificate thumbnails, shared by the experience roles and honor cards. */
+.evidence-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; }
+.evidence {
+  display: block; width: 100%; max-width: 240px;
+  border-radius: 12px; overflow: hidden;
+  background: var(--card); border: 1px solid var(--bdr);
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s var(--ease);
+}
+.evidence:hover { border-color: var(--bdr-hover); box-shadow: var(--shadow); transform: translateY(-2px); }
+.evidence img { display: block; width: 100%; height: auto; }
+.evidence-cap {
+  display: block; padding: 8px 12px;
+  font-size: 0.75rem; font-weight: 600; line-height: 1.4; color: var(--t-mid);
+  border-top: 1px solid var(--bdr);
+}
+
+#honors { background: var(--bg-1); }
+
+.honors-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;
+  align-items: start;
+}
+
+.honor-card {
+  position: relative; overflow: hidden;
+  padding: 28px; border-radius: 16px;
+  background: var(--card); border: 1px solid var(--bdr);
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.honor-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--ok), var(--accent));
+}
+.honor-card:hover { border-color: var(--bdr-hover); box-shadow: var(--shadow); }
+.honor-date   { font-size: 0.8125rem; font-weight: 600; color: var(--t-low); margin-bottom: 6px; }
+.honor-title  {
+  font-family: var(--font-display);
+  font-size: 1.0625rem; font-weight: 700; color: var(--t-high); line-height: 1.35;
+}
+.honor-issuer { margin: 4px 0 14px; font-size: 0.9375rem; font-weight: 600; color: var(--accent); }
+.honor-desc   { font-size: 0.9375rem; line-height: 1.65; color: var(--t-mid); }
+.honor-desc strong { color: var(--t-high); font-weight: 600; }
+.honor-card .evidence { max-width: 340px; }
+
 /* ── 10  SKILLS ───────────────────────────────────────────────────────── */
 #skills { background: var(--bg-1); }
 

@@ -254,6 +254,20 @@
     }
   }
 
+  /* ── Evidence images ──────────────────────────────────────────────────── */
+
+  // Certificate thumbnails shared by the experience and honors sections. Each
+  // one opens the full-size file in a new tab.
+  function evidenceLinks(list) {
+    if (!list || !list.length) return '';
+    return '<div class="evidence-row">' + list.map(function (ev) {
+      return '<a class="evidence" href="' + ev.src + '" target="_blank" rel="noopener">' +
+               '<img src="' + ev.src + '" alt="' + ev.alt + '" loading="lazy">' +
+               '<span class="evidence-cap">' + ev.caption + '</span>' +
+             '</a>';
+    }).join('') + '</div>';
+  }
+
   /* ── Experience ───────────────────────────────────────────────────────── */
 
   function renderExperience() {
@@ -290,6 +304,7 @@
                    (role.supervisor ? '<div class="exp-supervisor">' + role.supervisor + '</div>' : '') +
                    '<ul class="exp-buls">' + bullets + '</ul>' +
                    awards +
+                   evidenceLinks(role.evidence) +
                  '</div>' +
                '</div>';
       }).join('');
@@ -361,6 +376,28 @@
                '<div class="edu-detail edu-detail-loc">' + e.location + '</div>' +
                gpa +
              '</div>';
+    }).join('');
+  }
+
+  /* ── Honors & awards ──────────────────────────────────────────────────── */
+
+  function renderHonors() {
+    var el = mount('honors');
+    if (!el) return;
+
+    // Stable sort: equal sortKey keeps the order written in data.js.
+    var sorted = D.honors.map(function (h, i) { return { h: h, i: i }; })
+      .sort(function (a, b) { return (b.h.sortKey - a.h.sortKey) || (a.i - b.i); })
+      .map(function (x) { return x.h; });
+
+    el.innerHTML = sorted.map(function (h, i) {
+      return '<article class="honor-card r" ' + delay(i, 0.12) + '>' +
+               '<div class="honor-date">' + h.date + '</div>' +
+               '<h3 class="honor-title">' + h.title + '</h3>' +
+               '<div class="honor-issuer">' + h.issuer + '</div>' +
+               '<p class="honor-desc">' + h.description + '</p>' +
+               evidenceLinks(h.evidence) +
+             '</article>';
     }).join('');
   }
 
@@ -523,6 +560,7 @@
     renderExperience();
     renderSkills();
     renderEducation();
+    renderHonors();
     renderFeaturedProjects();
     renderAllProjects();
     renderCertifications();

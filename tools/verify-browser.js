@@ -19,7 +19,7 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
-const BASE = 'http://127.0.0.1:8099';
+const BASE = process.env.TARGET || 'http://127.0.0.1:8099';
 const SHOTS = path.join(__dirname, 'shots');
 fs.mkdirSync(SHOTS, { recursive: true });
 
@@ -85,7 +85,8 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
   const body = await page.evaluate(() => document.body.innerText);
   for (const term of ['Agentic ERP Platform', 'Management Portal', 'AI4ALL',
                       'Graduated — Excellent classification', 'OISP Scholarship',
-                      'permission layer', 'Jun – Oct 2025']) {
+                      'permission layer', 'Jun – Oct 2025',
+                      'Top 10 — AI Riser Vietnam 2026', 'Mr. Tam Nguyen Thanh']) {
     check(body.includes(term), 'content present: ' + term);
   }
   // Client / product names that must never appear on the public site.
@@ -117,6 +118,28 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
 
   const barsFilled = await page.$$eval('.sk-fill', (els) => els.filter((b) => b.style.width && b.style.width !== '0%').length);
   check(barsFilled === D.skills, 'every skill bar filled', `${barsFilled} of ${D.skills}`);
+
+  // --- Honors and evidence images ---
+  const honors = await page.evaluate(() => ({
+    expected: PORTFOLIO.honors.length,
+    evidence: PORTFOLIO.honors.reduce((n, h) => n + (h.evidence || []).length, 0) +
+              PORTFOLIO.experience.reduce((n, c) => n + c.roles.reduce((m, r) => m + (r.evidence || []).length, 0), 0),
+    cards: document.querySelectorAll('.honor-card').length,
+    thumbs: document.querySelectorAll('.evidence').length,
+    navHasHonors: [...document.querySelectorAll('.nav-links a')].some((a) => a.getAttribute('href') === '#honors'),
+    fptTitle: document.querySelector('.exp-role-title').textContent,
+  }));
+  check(honors.cards === honors.expected, 'honor cards match the data', `${honors.cards} of ${honors.expected}`);
+  check(honors.thumbs === honors.evidence, 'evidence thumbnails match the data', `${honors.thumbs} of ${honors.evidence}`);
+  check(honors.navHasHonors, 'nav links to the honors section');
+  check(honors.fptTitle === 'AI Engineer', 'current FPT role title', honors.fptTitle);
+  // Lazy images only load once scrolled near, so bring each into view first.
+  await page.$$eval('.evidence img', (imgs) => imgs.forEach((i) => i.scrollIntoView({ block: 'center' })));
+  await page.waitForTimeout(1200);
+  const broken = await page.$$eval('.evidence img', (imgs) =>
+    imgs.filter((i) => !(i.complete && i.naturalWidth > 0)).map((i) => i.getAttribute('src')));
+  check(broken.length === 0, 'every evidence image loads', broken.join(', ') || 'all loaded');
+  await page.evaluate(() => window.scrollTo(0, 0));
 
   // --- Hero rendering bugs that were fixed ---
   const hero = await page.evaluate(() => {

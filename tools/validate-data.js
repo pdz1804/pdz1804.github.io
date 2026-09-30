@@ -104,6 +104,34 @@ D.education.forEach((e, i) => {
   }
 });
 
+/* ── Evidence images (roles and honors) ───────────────────────────────── */
+const root = path.join(__dirname, '..');
+
+function checkEvidence(where, list) {
+  (list || []).forEach((ev, i) => {
+    const w = `${where}.evidence[${i}]`;
+    ['src', 'alt', 'caption'].forEach((k) => { if (!ev[k]) fail(`${w}: ${k} missing`); });
+    if (ev.src && !fs.existsSync(path.join(root, ev.src))) fail(`${w}: ${ev.src} does not exist`);
+  });
+}
+
+D.experience.forEach((co, ci) => {
+  co.roles.forEach((r, ri) => checkEvidence(`experience[${ci}].roles[${ri}]`, r.evidence));
+});
+
+/* ── Honors ───────────────────────────────────────────────────────────── */
+if (!Array.isArray(D.honors)) fail('honors must be an array');
+
+(D.honors || []).forEach((h, i) => {
+  const w = `honors[${i}] (${h.title || '?'})`;
+  ['title', 'issuer', 'date', 'description'].forEach((k) => { if (!h[k]) fail(`${w}: ${k} missing`); });
+  if (!Number.isInteger(h.sortKey) || h.sortKey % 100 < 1 || h.sortKey % 100 > 12) {
+    fail(`${w}: sortKey must be an integer YYYYMM (got ${h.sortKey})`);
+  }
+  if (!h.evidence || !h.evidence.length) warn(`${w}: no evidence image`);
+  checkEvidence(w, h.evidence);
+});
+
 /* ── Projects ─────────────────────────────────────────────────────────── */
 const seenTitles = new Set();
 
@@ -171,6 +199,7 @@ function report() {
     companies: D.experience.length,
     roles: D.experience.reduce((n, c) => n + c.roles.length, 0),
     skills: D.skills.reduce((n, g) => n + g.items.length, 0),
+    honors: (D.honors || []).length,
     projects: D.projects.professional.length + D.projects.academic.length,
     certifications: D.certifications.length,
   } : {};
