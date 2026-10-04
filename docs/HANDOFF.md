@@ -98,7 +98,7 @@ Revisit these only with a reason; each was a deliberate call.
   job-seeking site should not route enquiries to the current employer's inbox.
   One line in `data.js` if that changes.
 - **The published CV is a phone-free rebuild.** `assets/cv/…_CV.pdf` is built
-  from `CV_2page` with the `(+84) …` header fragment removed, because a
+  from the 1-page CV (`CV_2026_10_03_hr-feedback/CV_1page`) with the `(+84) …` header fragment removed, because a
   crawlable page should not carry a mobile number. Regeneration steps are in the
   README. The source in `D:\Personal\CV` is untouched and still has the phone.
 - **The landing page shows featured *professional* projects**, not academic
@@ -192,3 +192,13 @@ TARGET=http://127.0.0.1:8099 node tools/verify-devices.js       # 90 checks
 
 `tools/verify-sw-eviction.js` needs both trees prepared first; see the header
 comment in that file.
+
+## Content refresh (2026-10-04)
+
+Synced with the 2026-10-03 HR-feedback CV set (`D:\Personal\CV\CV_2026_10_03_hr-feedback`):
+role titles are "AI Engineer" everywhere; the "tens of seconds to a single query" claim was
+removed (no measured numbers); healthcare chatbot now states how >90% was measured (golden
+dataset by tester + BA + PM) and the 30s -> 15s -> 8s latency in two steps; ERP shows stealth
+mode, ~1,000 users / ~100 DAU; the Management Portal is described as solo-built and ~2 weeks
+faster customer acceptance; the ICPC Honorable Mention was added to Education. The download is
+now the phone-free **1-page** CV. Edit-in-place only: no entry was duplicated.
