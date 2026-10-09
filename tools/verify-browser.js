@@ -125,7 +125,7 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
     evidence: PORTFOLIO.honors.reduce((n, h) => n + (h.evidence || []).length, 0) +
               PORTFOLIO.experience.reduce((n, c) => n + c.roles.reduce((m, r) => m + (r.evidence || []).length, 0), 0),
     cards: document.querySelectorAll('.honor-card').length,
-    thumbs: document.querySelectorAll('.evidence').length,
+    thumbs: document.querySelectorAll('.evidence, .ec-slide').length,
     navHasHonors: [...document.querySelectorAll('.nav-links a')].some((a) => a.getAttribute('href') === '#honors'),
     fptTitle: document.querySelector('.exp-role-title').textContent,
   }));
@@ -134,9 +134,10 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
   check(honors.navHasHonors, 'nav links to the honors section');
   check(honors.fptTitle === 'AI Engineer', 'current FPT role title', honors.fptTitle);
   // Lazy images only load once scrolled near, so bring each into view first.
-  await page.$$eval('.evidence img', (imgs) => imgs.forEach((i) => i.scrollIntoView({ block: 'center' })));
-  await page.waitForTimeout(1200);
-  const broken = await page.$$eval('.evidence img', (imgs) =>
+  // Carousel slides are stacked and hidden until shown, so force every image to load eagerly.
+  await page.$$eval('.evidence img, .ec-slide img', (imgs) => imgs.forEach((i) => { i.loading = 'eager'; i.scrollIntoView({ block: 'center' }); }));
+  await page.waitForTimeout(2500);
+  const broken = await page.$$eval('.evidence img, .ec-slide img', (imgs) =>
     imgs.filter((i) => !(i.complete && i.naturalWidth > 0)).map((i) => i.getAttribute('src')));
   check(broken.length === 0, 'every evidence image loads', broken.join(', ') || 'all loaded');
   await page.evaluate(() => window.scrollTo(0, 0));
@@ -329,8 +330,11 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
     const fp = await browser.newPage({ viewport: { width: w, height: 800 } });
     await fp.goto(BASE + '/index.html', { waitUntil: 'networkidle' });
     await fp.waitForTimeout(500);
-    await fp.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-    await fp.waitForTimeout(400);
+    await fp.evaluate(() => {
+      document.documentElement.style.scrollBehavior = 'auto';   // smooth scroll would still be animating
+      window.scrollTo(0, document.documentElement.scrollHeight);
+    });
+    await fp.waitForTimeout(700);
     const res = await fp.evaluate(() => {
       const last = [...document.querySelectorAll('.footer-links a')].pop();
       const btn = document.getElementById('scroll-top');
