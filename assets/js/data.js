@@ -316,6 +316,11 @@ const PORTFOLIO = {
         'Honorable Mention, 2023 ICPC Vietnam Northern Provincial Programming Contest',
       ],
       gpa: { value: '3.8', scale: '/ 4.0', label: 'Cumulative GPA' },
+      // Official transcript, 3 pages. Student ID, date of birth and document number are blacked out
+      // and the file is image-only, so nothing sits under the boxes (this site is crawlable).
+      docs: [
+        { href: 'assets/docs/academic-transcript-hcmut.pdf', label: 'Academic transcript (PDF, identifiers redacted)' },
+      ],
     },
     {
       institution: 'Le Hong Phong High School For The Gifted',

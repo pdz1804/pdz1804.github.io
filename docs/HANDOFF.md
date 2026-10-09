@@ -108,6 +108,10 @@ Revisit these only with a reason; each was a deliberate call.
   bytes as uploaded) — strip any new photo with `magick -auto-orient -strip`.
   The Top 10 honor includes a photo naming a family member in its alt text, by
   the owner's explicit decision (2026-10-09).
+- **The HCMUT transcript is published redacted.** `assets/docs/academic-transcript-hcmut.pdf` is an image-only
+  rebuild with the student ID, date of birth and document number blacked out (no text layer, so nothing
+  sits under the boxes). It is linked from the HCMUT education card via `education[].docs`. The unredacted
+  original is on LinkedIn only, by the owner's choice (2026-10-10). Never publish the original here.
 - **The landing page shows featured *professional* projects**, not academic
   coursework. Controlled by `featured: true` — currently Agentic ERP Platform,
   Healthcare Chatbot & Management Portal, M3ARAG.

@@ -453,6 +453,10 @@
                (e.status ? '<span class="edu-status">🎓 ' + e.status + '</span>' : '') +
                e.details.map(function (d) { return '<div class="edu-detail">' + d + '</div>'; }).join('') +
                '<div class="edu-detail edu-detail-loc">' + e.location + '</div>' +
+               (e.docs || []).map(function (d) {
+                 return '<a class="edu-doc" href="' + d.href + '" target="_blank" rel="noopener">' +
+                          '📄 ' + d.label + '</a>';
+               }).join('') +
                gpa +
              '</div>';
     }).join('');

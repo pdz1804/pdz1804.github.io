@@ -836,6 +836,12 @@ button { font-family: inherit; cursor: pointer; }
 }
 .edu-detail-loc { color: var(--t-low); }
 .edu-detail-loc::before { content: '📍'; color: inherit; }
+.edu-doc {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 6px;
+  font-size: 0.875rem; font-weight: 600; color: var(--accent); text-decoration: none;
+}
+.edu-doc:hover { text-decoration: underline; }
+.edu-doc:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 
 .edu-gpa { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--bdr); }
 .edu-gpa-num {

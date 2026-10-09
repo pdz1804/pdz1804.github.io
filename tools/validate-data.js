@@ -102,6 +102,10 @@ D.education.forEach((e, i) => {
   if (e.gpa && (!e.gpa.value || !e.gpa.label)) {
     fail(`education[${i}] (${e.institution}): gpa needs both value and label`);
   }
+  (e.docs || []).forEach((d, di) => {
+    if (!d.href || !d.label) fail(`education[${i}].docs[${di}]: href and label are required`);
+    else if (!fs.existsSync(path.join(__dirname, '..', d.href))) fail(`education[${i}].docs[${di}]: ${d.href} does not exist`);
+  });
 });
 
 /* ── Evidence images (roles and honors) ───────────────────────────────── */
