@@ -260,12 +260,91 @@
   // one opens the full-size file in a new tab.
   function evidenceLinks(list) {
     if (!list || !list.length) return '';
+    if (list.length >= 3) return evidenceCarousel(list);
     return '<div class="evidence-row">' + list.map(function (ev) {
       return '<a class="evidence" href="' + ev.src + '" target="_blank" rel="noopener">' +
                '<img src="' + ev.src + '" alt="' + ev.alt + '" loading="lazy">' +
                '<span class="evidence-cap">' + ev.caption + '</span>' +
              '</a>';
     }).join('') + '</div>';
+  }
+
+  // Three or more photos: one slide at a time with Back/Next (looping), dots
+  // and a counter, instead of a tall stack. Slides stay in the DOM so every
+  // alt text is readable; only the active one is shown. The image still opens
+  // full-size in a new tab.
+  function esc(t) { return String(t).replace(/"/g, '&quot;'); }
+
+  function evidenceCarousel(list) {
+    var slides = list.map(function (ev, i) {
+      return '<a class="ec-slide" href="' + ev.src + '" target="_blank" rel="noopener"' +
+               ' data-caption="' + esc(ev.caption) + '"' + (i ? ' hidden' : '') + '>' +
+               '<img src="' + ev.src + '" alt="' + esc(ev.alt) + '" loading="lazy">' +
+             '</a>';
+    }).join('');
+    var dots = list.map(function (ev, i) {
+      return '<button type="button" class="ec-dot" data-i="' + i + '" aria-label="Show image ' + (i + 1) +
+             ' of ' + list.length + '"' + (i ? '' : ' aria-current="true"') + '></button>';
+    }).join('');
+    return '<div class="ec" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Photos, use the arrow keys to browse">' +
+             '<div class="ec-stage">' + slides +
+               '<button type="button" class="ec-btn ec-prev" aria-label="Previous image">&#8249;</button>' +
+               '<button type="button" class="ec-btn ec-next" aria-label="Next image">&#8250;</button>' +
+             '</div>' +
+             '<div class="ec-foot">' +
+               '<span class="ec-cap" aria-live="polite">' + list[0].caption + '</span>' +
+               '<span class="ec-count">1 / ' + list.length + '</span>' +
+             '</div>' +
+             '<div class="ec-dots">' + dots + '</div>' +
+           '</div>';
+  }
+
+  function ecShow(ec, to) {
+    var slides = ec.querySelectorAll('.ec-slide');
+    var dots   = ec.querySelectorAll('.ec-dot');
+    var n = slides.length;
+    var i = ((to % n) + n) % n;
+    for (var k = 0; k < n; k++) {
+      slides[k].hidden = k !== i;
+      if (k === i) dots[k].setAttribute('aria-current', 'true');
+      else dots[k].removeAttribute('aria-current');
+    }
+    ec.querySelector('.ec-cap').textContent   = slides[i].getAttribute('data-caption');
+    ec.querySelector('.ec-count').textContent = (i + 1) + ' / ' + n;
+    ec.setAttribute('data-i', i);
+  }
+
+  function bindCarousels() {
+    function current(ec) { return parseInt(ec.getAttribute('data-i') || '0', 10); }
+
+    document.addEventListener('click', function (e) {
+      var ec = e.target.closest && e.target.closest('.ec');
+      if (!ec) return;
+      var dot = e.target.closest('.ec-dot');
+      if (e.target.closest('.ec-prev')) ecShow(ec, current(ec) - 1);
+      else if (e.target.closest('.ec-next')) ecShow(ec, current(ec) + 1);
+      else if (dot) ecShow(ec, parseInt(dot.getAttribute('data-i'), 10));
+    });
+
+    document.addEventListener('keydown', function (e) {
+      var ec = e.target.closest && e.target.closest('.ec');
+      if (!ec || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+      e.preventDefault();
+      ecShow(ec, current(ec) + (e.key === 'ArrowRight' ? 1 : -1));
+    });
+
+    // Swipe on touch screens.
+    var startX = null;
+    document.addEventListener('touchstart', function (e) {
+      startX = e.target.closest && e.target.closest('.ec-stage') ? e.touches[0].clientX : null;
+    }, { passive: true });
+    document.addEventListener('touchend', function (e) {
+      if (startX === null) return;
+      var dx = e.changedTouches[0].clientX - startX;
+      var ec = e.target.closest && e.target.closest('.ec');
+      startX = null;
+      if (ec && Math.abs(dx) > 40) ecShow(ec, current(ec) + (dx < 0 ? 1 : -1));
+    }, { passive: true });
   }
 
   /* ── Experience ───────────────────────────────────────────────────────── */
@@ -569,5 +648,6 @@
   };
 
   window.renderPortfolio();
+  bindCarousels();
 
 })(window, document);

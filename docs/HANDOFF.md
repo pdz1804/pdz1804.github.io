@@ -101,6 +101,13 @@ Revisit these only with a reason; each was a deliberate call.
   from the 1-page CV (`CV_2026_10_03_hr-feedback/CV_1page`) with the `(+84) …` header fragment removed, because a
   crawlable page should not carry a mobile number. Regeneration steps are in the
   README. The source in `D:\Personal\CV` is untouched and still has the phone.
+- **Evidence with 3+ images renders as a carousel** (`evidenceCarousel` in
+  `render.js`, `.ec-*` in `main.css`): looping Back/Next, dots, arrow keys, swipe.
+  One or two images stay as plain thumbnails. Photos in `images/evidence/` are
+  EXIF-stripped and ≤1600px (iPhone originals carry GPS, and Pages serves the
+  bytes as uploaded) — strip any new photo with `magick -auto-orient -strip`.
+  The Top 10 honor includes a photo naming a family member in its alt text, by
+  the owner's explicit decision (2026-10-09).
 - **The landing page shows featured *professional* projects**, not academic
   coursework. Controlled by `featured: true` — currently Agentic ERP Platform,
   Healthcare Chatbot & Management Portal, M3ARAG.

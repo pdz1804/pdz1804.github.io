@@ -341,17 +341,49 @@ const PORTFOLIO = {
     {
       title:   'Top 10 — AI Riser Vietnam 2026',
       issuer:  'Google for Developers · #BuildwithGoogleAI',
-      date:    'Sep 2026',
-      sortKey: 202609,
+      date:    'Oct 2026',
+      sortKey: 202610,
       description:
-        'Selected as a Top 10 team for <strong>Sách Của Em</strong>, a teacher studio that turns photos of ' +
-        'textbook pages into printable, curriculum-cited lessons for Vietnamese primary-school teachers, built ' +
-        'end to end on Google technology. Invited to present at the AI Riser Demo Day at GEM Center, Ho Chi Minh City.',
+        'Selected as one of the Top 10 outstanding projects for <strong>Sách Của Em</strong>, a teacher studio that ' +
+        'turns photos of textbook pages into printable, curriculum-cited lessons for Vietnamese primary-school ' +
+        'teachers, built end to end on Google technology. Presented live at the AI Riser Demo Day at GEM Center, ' +
+        'Ho Chi Minh City (08/10/2026), where it ranked <strong>4th of 10</strong> in the audience-favourite poll ' +
+        '(26% of the vote).',
       evidence: [
         {
           src:     'images/evidence/ai-riser-vietnam-2026-top-10.jpg',
           alt:     'Google for Developers AI Riser Vietnam 2026 Top 10 Certificate of Completion',
           caption: 'AI Riser Vietnam 2026 — Top 10 Certificate of Completion',
+        },
+        {
+          src:     'images/evidence/demo-day-stage-presentation.jpg',
+          alt:     'Nguyễn Quang Phú on stage at the AI Riser Vietnam 2026 Demo Day presenting Sách Của Em; the screen reads "Dự án: Sách Của Em, Đại diện trình bày: Nguyễn Quang Phú"',
+          caption: 'Presenting Sách Của Em at the Demo Day',
+        },
+        {
+          src:     'images/evidence/demo-day-audience-poll.jpg',
+          alt:     'Slido poll "3 Dự án bạn yêu thích nhất": Sách Của Em placed 4th of 10 with 26% of the vote, behind Đúng Nơi 34%, InnoVerse 31% and SightBridge AI 27%',
+          caption: 'Demo Day audience poll — 4th of 10 (26%)',
+        },
+        {
+          src:     'images/evidence/top-10-finalists-slide.jpg',
+          alt:     'Demo Day screen titled "Top 10 dự án xuất sắc nhất" showing ten finalist portraits in two rows of five, with Nguyễn Quang Phú and Sách của Em first in the top row',
+          caption: 'The Top 10 outstanding projects',
+        },
+        {
+          src:     'images/evidence/demo-day-finalists-on-stage.jpg',
+          alt:     'The Top 10 finalists and organisers in a row on the AI Riser Vietnam 2026 Demo Day stage, each holding a crystal trophy and a certificate',
+          caption: 'The Top 10 finalists on stage',
+        },
+        {
+          src:     'images/evidence/demo-day-phu-and-nhu-khanh.jpg',
+          alt:     'Nguyễn Quang Phú in a black T-shirt giving a thumbs-up, holding a bouquet of white and blue roses next to his girlfriend Như Khánh, in a white dress, at the AI Riser Vietnam 2026 Demo Day backdrop',
+          caption: 'With Như Khánh at the Demo Day',
+        },
+        {
+          src:     'images/evidence/top-10-trophy-certificate-gifts.jpg',
+          alt:     'Crystal trophy engraved "Top 10 Outstanding AI Riser Vietnam Projects, Sách Của Em, Nguyễn Quang Phú", a framed Certificate of Completion, a bouquet, a Google Cloud tote bag, a keyboard and mouse combo, a charging-cable set and a plush toy',
+          caption: 'Top 10 trophy, certificate and Google gifts',
         },
       ],
     },
