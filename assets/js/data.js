@@ -627,6 +627,14 @@ const PORTFOLIO = {
     // Self-driven & academic. Ordered strongest-first, matching the CV.
     academic: [
       {
+        title:  'Tech News Mystery — AI Tech-News Workspace',
+        period: 'May – Jun 2026',
+        meta:   'Personal project · full-stack and cloud',
+        link:   'https://github.com/pdz1804/tech-new-mystery',
+        desc:   'AI technology-news workspace: crawls articles (Crawl4AI, NewsAPI, Tavily), embeds them into Qdrant, groups them into semantic topic clusters on a PCA embedding map, and answers through a streamed chat agent and a voice agent (ElevenLabs STT/TTS over LiveKit with talk-over interruption). Agent runtime on LangGraph and AWS Bedrock AgentCore, background work in Celery, infrastructure as Terraform on AWS with GitHub Actions CI/CD, Next.js front end.',
+        tags:   ['LangGraph', 'AWS Bedrock AgentCore', 'FastAPI', 'Next.js', 'Qdrant', 'Celery', 'Terraform'],
+      },
+      {
         title:  'Fine-tuning Language Models for NLP Tasks',
         period: 'April 2025',
         meta:   'Team of 5 · NLP Course',
