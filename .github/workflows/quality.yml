@@ -1,0 +1,87 @@
+name: quality
+
+# Pages deploys straight from main, so this cannot hold a deploy back — it tells
+# you within minutes that something already shipped is wrong. Keep the first job
+# fast and dependency-free; the browser suites are slower and run after it.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  published:
+    name: content and published files
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # pdftotext / pdfinfo back the PDF privacy checks in check-published.js
+      - name: Install poppler
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
+      - name: Validate content data
+        run: node tools/validate-data.js
+
+      - name: Check what the site actually serves
+        run: node tools/check-published.js
+
+  browser:
+    name: browser and device suites
+    needs: published
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright (not a repo dependency)
+        run: |
+          npm install --no-save --no-package-lock playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Serve the site locally
+        run: |
+          python3 -m http.server 8099 > /tmp/site.log 2>&1 &
+          for i in $(seq 1 20); do
+            curl --fail --silent http://127.0.0.1:8099/index.html > /dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/site.log
+          exit 1
+
+      - name: Browser suite
+        env:
+          TARGET: http://127.0.0.1:8099
+        run: node tools/verify-browser.js
+
+      # verify-devices.js defaults to the live site; TARGET points it at the local copy.
+      - name: Device suite
+        env:
+          TARGET: http://127.0.0.1:8099
+        run: node tools/verify-devices.js
+
+      - name: Keep screenshots when something failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: shots
+          path: tools/shots
+          if-no-files-found: ignore
+          retention-days: 7

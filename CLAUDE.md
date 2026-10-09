@@ -37,8 +37,13 @@ non-zero on error.
 
 ## Verifying
 
+CI (`.github/workflows/quality.yml`) runs `validate-data`, `check-published` and both browser
+suites on every push to `main` and every PR. Pages deploys from `main` regardless, so CI reports
+after the fact; treat a red run as something already live that needs fixing.
+
 ```sh
 node tools/validate-data.js                                     # always
+node tools/check-published.js                                   # always: PDFs, EXIF, forbidden names, refs
 npm install --no-save playwright                                # for the rest
 node tools/verify-browser.js                                    # 67 checks
 TARGET=https://pdz1804.github.io node tools/verify-devices.js   # 90 checks

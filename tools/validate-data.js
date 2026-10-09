@@ -79,8 +79,7 @@ D.experience.forEach((co, ci) => {
   });
 });
 
-if (openRoles === 0) warn('no role has end:null — nothing renders as "Current"');
-if (openRoles > 1)  warn(`${openRoles} roles have end:null — more than one shows as "Current"`);
+if (openRoles !== 1) fail(`${openRoles} roles have end:null — exactly one is required (it drives the "Current" label and the hero card)`);
 
 /* ── Skills ───────────────────────────────────────────────────────────── */
 D.skills.forEach((g, gi) => {

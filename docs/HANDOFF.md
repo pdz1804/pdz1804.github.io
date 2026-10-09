@@ -192,8 +192,17 @@ Worth reading before debugging something that looks broken.
 
 ## Verifying after a change
 
+CI (`.github/workflows/quality.yml`, added 2026-10-10) runs the content check, the published-file
+check and the browser/device suites on every push and PR. It cannot block a deploy — Pages builds
+from `main` on its own — so a red run means something already live is wrong.
+`tools/check-published.js` covers what the other suites cannot see: forbidden names and phone-like
+numbers in every served file, the PDF allowlist (the transcript must stay image-only and free of
+student ID / birth date / document number), EXIF/XMP/IPTC in evidence JPEGs, size budgets, local
+references, sitemap and robots.
+
 ```sh
 node tools/validate-data.js                                     # always; no deps
+node tools/check-published.js                                   # always; no deps (needs poppler for PDF text)
 
 npm install --no-save playwright                                # only for the rest
 python -m http.server 8099                                      # separate terminal
