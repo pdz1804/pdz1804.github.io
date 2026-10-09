@@ -15,13 +15,13 @@ site that renders itself from one content file. Content is synced with the CV in
 what changed in that sync.
 
 ```
-af813bd  chore: remove Create React App build output
-6c779ac  refactor: rebuild site as data-driven static pages
-9d872b4  fix: correct certification ordering and role-append handling
-4656a77  fix: meet the 44px touch-target minimum on mobile controls
-f99719c  docs: add handoff context
-f12be25  fix: keep working documents out of the published site
-b85ada2  content: sync portfolio with the September 2026 CV            ← live
+7a49231  chore: remove Create React App build output
+6bc9b5b  refactor: rebuild site as data-driven static pages
+1129208  fix: correct certification ordering and role-append handling
+3f16f74  fix: meet the 44px touch-target minimum on mobile controls
+6726e17  docs: add handoff context
+664b424  fix: keep working documents out of the published site
+e9c9920  content: sync portfolio with the September 2026 CV            ← live
 ```
 
 Verification at the time of handoff, all against the live site:
