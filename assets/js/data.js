@@ -351,9 +351,19 @@ const PORTFOLIO = {
         '(26% of the vote).',
       evidence: [
         {
+          src:     'images/evidence/demo-day-phu-and-nhu-khanh.jpg',
+          alt:     'Nguyễn Quang Phú in a black T-shirt giving a thumbs-up, holding a bouquet of white and blue roses next to his girlfriend Như Khánh, in a white dress, at the AI Riser Vietnam 2026 Demo Day backdrop',
+          caption: 'With Như Khánh at the Demo Day',
+        },
+        {
           src:     'images/evidence/ai-riser-vietnam-2026-top-10.jpg',
           alt:     'Google for Developers AI Riser Vietnam 2026 Top 10 Certificate of Completion',
           caption: 'AI Riser Vietnam 2026 — Top 10 Certificate of Completion',
+        },
+        {
+          src:     'images/evidence/top-10-trophy-certificate-gifts.jpg',
+          alt:     'Crystal trophy engraved "Top 10 Outstanding AI Riser Vietnam Projects, Sách Của Em, Nguyễn Quang Phú", a framed Certificate of Completion, a bouquet, a Google Cloud tote bag, a keyboard and mouse combo, a charging-cable set and a plush toy',
+          caption: 'Top 10 trophy, certificate and Google gifts',
         },
         {
           src:     'images/evidence/demo-day-stage-presentation.jpg',
@@ -374,16 +384,6 @@ const PORTFOLIO = {
           src:     'images/evidence/demo-day-finalists-on-stage.jpg',
           alt:     'The Top 10 finalists and organisers in a row on the AI Riser Vietnam 2026 Demo Day stage, each holding a crystal trophy and a certificate',
           caption: 'The Top 10 finalists on stage',
-        },
-        {
-          src:     'images/evidence/demo-day-phu-and-nhu-khanh.jpg',
-          alt:     'Nguyễn Quang Phú in a black T-shirt giving a thumbs-up, holding a bouquet of white and blue roses next to his girlfriend Như Khánh, in a white dress, at the AI Riser Vietnam 2026 Demo Day backdrop',
-          caption: 'With Như Khánh at the Demo Day',
-        },
-        {
-          src:     'images/evidence/top-10-trophy-certificate-gifts.jpg',
-          alt:     'Crystal trophy engraved "Top 10 Outstanding AI Riser Vietnam Projects, Sách Của Em, Nguyễn Quang Phú", a framed Certificate of Completion, a bouquet, a Google Cloud tote bag, a keyboard and mouse combo, a charging-cable set and a plush toy',
-          caption: 'Top 10 trophy, certificate and Google gifts',
         },
       ],
     },
