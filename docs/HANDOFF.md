@@ -98,7 +98,7 @@ Revisit these only with a reason; each was a deliberate call.
   job-seeking site should not route enquiries to the current employer's inbox.
   One line in `data.js` if that changes.
 - **The published CV is a phone-free rebuild.** `assets/cv/…_CV.pdf` is built
-  from the 1-page CV (`CV_2026_10_03_hr-feedback/CV_1page`) with the `(+84) …` header fragment removed, because a
+  from the full CV (`CV_2026_10_03_hr-feedback/CV_full`, 2 pages) with the `(+84) …` header fragment removed, because a
   crawlable page should not carry a mobile number. Regeneration steps are in the
   README. The source in `D:\Personal\CV` is untouched and still has the phone.
 - **Evidence with 3+ images renders as a carousel** (`evidenceCarousel` in
@@ -208,4 +208,4 @@ removed (no measured numbers); healthcare chatbot now states how >90% was measur
 dataset by tester + BA + PM) and the 30s -> 15s -> 8s latency in two steps; ERP shows stealth
 mode, ~1,000 users / ~100 DAU; the Management Portal is described as solo-built and ~2 weeks
 faster customer acceptance; the ICPC Honorable Mention was added to Education. The download is
-now the phone-free **1-page** CV. Edit-in-place only: no entry was duplicated.
+now the phone-free **full** CV (2 pages, switched from the 1-page build on 2026-10-09). Edit-in-place only: no entry was duplicated.

@@ -118,15 +118,15 @@ new component works in both themes without a theme-specific rule.
 
 ## Updating the CV download
 
-`assets/cv/Nguyen_Quang_Phu_CV.pdf` is a **phone-free** build of the **1-page CV** (2026-10-03 HR-feedback set) —
-the source in `D:\Personal\CV\CV_2026_10_03_hr-feedback\CV_1page` keeps the phone number, which should not
+`assets/cv/Nguyen_Quang_Phu_CV.pdf` is a **phone-free** build of the **full CV (2 pages)** (2026-10-03 HR-feedback set) —
+the source in `D:\Personal\CV\CV_2026_10_03_hr-feedback\CV_full` keeps the phone number, which should not
 go on a public, crawlable page. To refresh it after a CV change:
 
 ```sh
-cp -r "D:/Personal/CV/CV_2026_10_03_hr-feedback/CV_1page" ./cv-build && cd cv-build
-# delete the "(+84) …" phone fragment from the header block in CV_1page.tex
-pdflatex CV_1page.tex && pdflatex CV_1page.tex
-cp CV_1page.pdf ../assets/cv/Nguyen_Quang_Phu_CV.pdf
+cp -r "D:/Personal/CV/CV_2026_10_03_hr-feedback/CV_full" ./cv-build && cd cv-build
+# delete the "(+84) …" phone fragment from the header block in CV_full.tex
+pdflatex CV_full.tex && pdflatex CV_full.tex
+cp CV_full.pdf ../assets/cv/Nguyen_Quang_Phu_CV.pdf
 cd .. && rm -rf cv-build
 ```
 
