@@ -1,6 +1,9 @@
 {
   "classic": {
     "literals": 47,
-    "componentTheme": 3
+    "componentTheme": 3,
+    "axe": [
+      "color-contrast"
+    ]
   }
 }

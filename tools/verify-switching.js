@@ -13,7 +13,7 @@
 'use strict';
 
 const path = require('path');
-const { chromium } = require('playwright');
+const { launch } = require('./lib/browser');
 const { listDesigns } = require('./list-designs');
 const { pageUrl } = require('./lib/urls');
 
@@ -26,11 +26,11 @@ let failed = 0;
 const t = (n, ok, d) => { if (!ok) failed++; out.push((ok ? 'PASS' : 'FAIL') + '  ' + n + (d ? '  [' + String(d).slice(0, 240) + ']' : '')); };
 const url = (page, o) => pageUrl(BASE, page, Object.assign({ extra: { v: String(Date.now() + Math.random()) } }, o));
 const pick = async (p, id) => { await p.click('.pds-trigger'); await p.click(`.pds-opt[data-design-id="${id}"]`); };
-const ready = (p, id) => p.waitForFunction((d) => document.documentElement.dataset.designReady === d, id, { timeout: 9000 });
+const ready = (p, id) => p.waitForFunction((d) => document.documentElement.dataset.designReady === d, id, { timeout: 20000 });
 
 (async () => {
   if (!B) { console.log('Needs two designs.'); process.exit(0); }
-  const browser = await chromium.launch();
+  const browser = await launch();
 
   /* ── Live switch both ways ─────────────────────────────────────────────── */
   {
@@ -91,8 +91,7 @@ const ready = (p, id) => p.waitForFunction((d) => document.documentElement.datas
     await p.goto(url('home', { design: A, switcher: true }));
     await ready(p, A);
     await pick(p, B);          // starts loading slowly
-    await p.waitForTimeout(150);
-    await p.click(`.pds-opt[data-design-id="${A}"]`);   // list is still open: changes their mind
+    await p.evaluate((a) => document.querySelector(`.pds-opt[data-design-id="${a}"]`).click(), A);   // list is still open: changes their mind (no actionability wait: the slow switch must still be loading)
     await p.waitForTimeout(3500);
     const r = await p.evaluate((ids) => ({
       cur: window.Portfolio.current(), q: location.search, saved: localStorage.getItem('nqp-design'),
@@ -182,7 +181,7 @@ const ready = (p, id) => p.waitForFunction((d) => document.documentElement.datas
     await ctx.route(`**/designs/${B}/*.css`, (r) => r.abort());
     const p = await ctx.newPage();
     await p.goto(url('home', { design: B }));
-    await p.waitForFunction(() => document.documentElement.dataset.designReady, null, { timeout: 9000 });
+    await p.waitForFunction(() => document.documentElement.dataset.designReady, null, { timeout: 20000 });
     const f = await p.evaluate(() => ({ cur: window.Portfolio.current(), banner: !!document.querySelector('.pds-banner'), content: !!document.querySelector('#experience') }));
     t(`${B} failing to load falls back to ${A} with a banner`, f.cur === A && f.banner && f.content, JSON.stringify(f));
     await ctx.close();
@@ -194,7 +193,7 @@ const ready = (p, id) => p.waitForFunction((d) => document.documentElement.datas
     await ctx.route('**/core/loader.js', (r) => r.abort());
     const p = await ctx.newPage();
     await p.goto(url('home', { design: B }));
-    await p.waitForTimeout(7600);
+    await p.waitForTimeout(9500);   // boot.js guard fires at 7 s
     const r = await p.evaluate(() => ({
       loading: document.documentElement.hasAttribute('data-design-loading'),
       css: !!document.querySelector('link[data-design-css="classic"]'),
@@ -223,7 +222,7 @@ const ready = (p, id) => p.waitForFunction((d) => document.documentElement.datas
     const errs = [];
     p.on('pageerror', (e) => errs.push(String(e)));
     await p.goto('file:///' + path.join(ROOT, 'index.html').replace(/\\/g, '/') + '?design=' + B);
-    await p.waitForFunction(() => document.documentElement.dataset.designReady, null, { timeout: 9000 });
+    await p.waitForFunction(() => document.documentElement.dataset.designReady, null, { timeout: 20000 });
     t(`file:// mounts ${B} with no errors`, await p.evaluate((b) => window.Portfolio.current() === b, B) && errs.length === 0, errs.join(' | '));
     await ctx.close();
   }

@@ -3,6 +3,14 @@ name: quality
 # Pages deploys straight from main, so this cannot hold a deploy back — it tells
 # you within minutes that something already shipped is wrong. Keep the first job
 # fast and dependency-free; the browser suites are slower and run after it.
+#
+# What is covered:
+#   published  content, meta tags, view-model, what the site actually serves
+#   design     every design in designs/registry.js x Chromium, Firefox, WebKit
+#   switching  live switching, fallbacks, stuck loads x the same three engines
+#   browser    the page/device suites (Chromium)
+#   guards     breaks the code on purpose and requires the checks above to notice
+#   all-green  the single job to require in branch protection
 
 on:
   push:
@@ -16,6 +24,10 @@ permissions:
 concurrency:
   group: quality-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  PLAYWRIGHT_VERSION: 1.49.1
+  AXE_VERSION: 4.10.2
 
 jobs:
   published:
@@ -62,14 +74,15 @@ jobs:
         run: echo "ids=$(node tools/list-designs.js)" >> "$GITHUB_OUTPUT"
 
   design:
-    name: design contract (${{ matrix.id }})
+    name: design contract (${{ matrix.id }}, ${{ matrix.browser }})
     needs: [list, published]
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
         id: ${{ fromJson(needs.list.outputs.ids) }}
+        browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
 
@@ -77,14 +90,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Playwright (not a repo dependency)
+      # axe-core is installed in the same command: a second `npm install --no-save`
+      # would prune the first.
+      - name: Install Playwright and axe-core (not repo dependencies)
         run: |
-          npm install --no-save --no-package-lock playwright@1.49.1
-          npx playwright install --with-deps chromium
+          npm install --no-save --no-package-lock playwright@${PLAYWRIGHT_VERSION} axe-core@${AXE_VERSION}
+          npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Serve the site locally
         run: |
-          python3 -m http.server 8099 > /tmp/site.log 2>&1 &
+          node tools/serve.js 8099 > /tmp/site.log 2>&1 &
           for i in $(seq 1 20); do
             curl --fail --silent http://127.0.0.1:8099/index.html > /dev/null && exit 0
             sleep 1
@@ -96,19 +111,66 @@ jobs:
         env:
           TARGET: http://127.0.0.1:8099
           DESIGN: ${{ matrix.id }}
+          BROWSER: ${{ matrix.browser }}
         run: node tools/verify-design.js
 
       - name: Keep screenshots when something failed
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: design-shots-${{ matrix.id }}
+          name: design-shots-${{ matrix.id }}-${{ matrix.browser }}
+          path: tools/shots
+          if-no-files-found: ignore
+          retention-days: 7
+
+  switching:
+    name: switching and fallbacks (${{ matrix.browser }})
+    needs: published
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright (not a repo dependency)
+        run: |
+          npm install --no-save --no-package-lock playwright@${PLAYWRIGHT_VERSION}
+          npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Serve the site locally
+        run: |
+          node tools/serve.js 8099 > /tmp/site.log 2>&1 &
+          for i in $(seq 1 20); do
+            curl --fail --silent http://127.0.0.1:8099/index.html > /dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/site.log
+          exit 1
+
+      - name: Switching and fallback suite
+        env:
+          TARGET: http://127.0.0.1:8099
+          BROWSER: ${{ matrix.browser }}
+        run: node tools/verify-switching.js
+
+      - name: Keep screenshots when something failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: switching-shots-${{ matrix.browser }}
           path: tools/shots
           if-no-files-found: ignore
           retention-days: 7
 
   browser:
-    name: browser and device suites
+    name: page and device suites
     needs: published
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -121,12 +183,12 @@ jobs:
 
       - name: Install Playwright (not a repo dependency)
         run: |
-          npm install --no-save --no-package-lock playwright@1.49.1
+          npm install --no-save --no-package-lock playwright@${PLAYWRIGHT_VERSION}
           npx playwright install --with-deps chromium
 
       - name: Serve the site locally
         run: |
-          python3 -m http.server 8099 > /tmp/site.log 2>&1 &
+          node tools/serve.js 8099 > /tmp/site.log 2>&1 &
           for i in $(seq 1 20); do
             curl --fail --silent http://127.0.0.1:8099/index.html > /dev/null && exit 0
             sleep 1
@@ -138,11 +200,6 @@ jobs:
         env:
           TARGET: http://127.0.0.1:8099
         run: node tools/verify-browser.js
-
-      - name: Switching and fallback suite
-        env:
-          TARGET: http://127.0.0.1:8099
-        run: node tools/verify-switching.js
 
       # verify-devices.js defaults to the live site; TARGET points it at the local copy.
       - name: Device suite
@@ -158,3 +215,51 @@ jobs:
           path: tools/shots
           if-no-files-found: ignore
           retention-days: 7
+
+  # Breaks the code in known ways (a leaked timer, a hard-coded colour, a drifted
+  # canonical URL, a forbidden name, a 404ing script, ...) and fails unless the
+  # intended check turns red each time. A green suite above is only worth
+  # something while this stays green.
+  guards:
+    name: the checks catch real faults
+    needs: published
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install poppler
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils
+
+      - name: Install Playwright and axe-core (not repo dependencies)
+        run: |
+          npm install --no-save --no-package-lock playwright@${PLAYWRIGHT_VERSION} axe-core@${AXE_VERSION}
+          npx playwright install --with-deps chromium
+
+      - name: Inject faults and require them to be caught
+        run: node tools/test-guards.js --browser
+
+  # Require this one job in branch protection. It is red if any job above is red,
+  # was cancelled or was skipped, so adding a job cannot silently weaken the gate.
+  all-green:
+    name: all checks passed
+    if: always()
+    needs: [published, list, design, switching, browser, guards]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Fail unless every job succeeded
+        env:
+          RESULTS: ${{ toJson(needs) }}
+        run: |
+          echo "$RESULTS" | node -e '
+            const r = JSON.parse(require("fs").readFileSync(0, "utf8"));
+            const bad = Object.entries(r).filter(([, v]) => v.result !== "success");
+            bad.forEach(([k, v]) => console.error(k + ": " + v.result));
+            process.exit(bad.length ? 1 : 0);
+          '
+          echo "Every job succeeded."

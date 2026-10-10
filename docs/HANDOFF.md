@@ -206,11 +206,16 @@ references, sitemap and robots.
 node tools/validate-data.js                                     # always; no deps
 node tools/check-published.js                                   # always; no deps (needs poppler for PDF text)
 
-npm install --no-save playwright                                # only for the rest
-python -m http.server 8099                                      # separate terminal
+npm install --no-save playwright axe-core                       # only for the rest (one command)
+node tools/serve.js 8099                                        # separate terminal; concurrent, WebKit-friendly
 node tools/verify-browser.js                                    # 67 checks
 TARGET=http://127.0.0.1:8099 node tools/verify-devices.js       # 90 checks
 ```
+
+`node tools/test-guards.js --browser` injects faults and requires each to be caught; run it after changing a suite.
+`BROWSER=firefox|webkit` runs verify-design / verify-switching on another engine. Known: Classic has
+pre-existing dark-theme colour-contrast findings (baselined in `design-baselines.json`, not fixed because that
+would change Classic's look); axe is skipped on WebKit (false positives).
 
 `tools/verify-sw-eviction.js` needs both trees prepared first; see the header
 comment in that file.

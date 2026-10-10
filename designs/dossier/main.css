@@ -271,7 +271,7 @@ ul{margin:0;padding:0;list-style:none}
 .ccard{display:flex;align-items:center;gap:14px;min-height:60px;padding:10px 16px;border-radius:14px;background:var(--accent-ink);color:var(--accent);text-decoration:none;transition:transform .18s}
 .ccard:hover{transform:translateX(4px)}
 .ccard-ico{width:28px;height:28px;flex:none}.ccard-ico svg{width:28px;height:28px}
-.ccard small{display:block;font:500 11px var(--f-mono);text-transform:uppercase;letter-spacing:.06em;opacity:.7}
+.ccard small{display:block;font:500 11px var(--f-mono);text-transform:uppercase;letter-spacing:.06em}
 .ccard b{display:block;font:600 15px var(--f-text);overflow-wrap:anywhere}
 .foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:30px 0 10px;font:500 12.5px var(--f-mono);color:var(--muted)}
 #to-top{position:fixed;right:16px;bottom:16px;width:48px;height:48px;border-radius:50%;border:1.5px solid var(--ink);background:var(--surface);color:var(--ink);font-size:20px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}

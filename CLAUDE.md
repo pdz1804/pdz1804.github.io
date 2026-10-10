@@ -52,11 +52,12 @@ after the fact; treat a red run as something already live that needs fixing.
 ```sh
 node tools/validate-data.js                                     # always
 node tools/check-published.js                                   # always: PDFs, EXIF, forbidden names, refs
-npm install --no-save playwright                                # for the rest
+npm install --no-save playwright axe-core                       # for the rest (BROWSER=firefox|webkit; node tools/serve.js 8099)
 node tools/verify-browser.js                                    # 98 checks
 TARGET=https://pdz1804.github.io node tools/verify-devices.js   # 90 checks
 node tools/verify-design.js                                     # every design: data, a11y, themes, switch leaks
 node tools/verify-switching.js                                  # live switching and fallbacks
+node tools/test-guards.js --browser                             # proves the checks fail on injected faults
 node tools/test-view-model.js && node tools/sync-meta.js        # derivations; static meta equals data.js
 ```
 

@@ -89,12 +89,14 @@ PortfolioDesigns.implement('aurora', {
 
 | Command | Proves |
 |---|---|
-| `DESIGN=<id> node tools/verify-design.js` | all data shown, injected data appears, edge data, a11y basics, no overflow at 390/768/1024/1440, reduced motion, CSS rules, switch-leak test |
-| `node tools/verify-switching.js` | live switching, scroll/focus kept, fallbacks, no-JS, `file://` |
+| `DESIGN=<id> node tools/verify-design.js` | all data shown, injected data appears, edge data, a11y basics + axe-core, no overflow at 390/768/1024/1440, reduced motion, CSS rules, switch-leak test |
+| `node tools/verify-switching.js` | live switching, scroll/focus kept, keyboard picker, fallbacks, stuck loads, no-JS, `file://` |
+| `node tools/test-guards.js [--browser]` | the checks above really fail when the code is broken (fault injection) |
 | `node tools/test-view-model.js` | the derivations, with a fixed clock |
 | `node tools/sync-meta.js` | canonical/OG/JSON-LD/sitemap/manifest equal `data.js` (`--write` fixes) |
 
-CI builds its matrix from `node tools/list-designs.js`.
+CI builds its matrix from `node tools/list-designs.js` and runs every design on Chromium, Firefox and WebKit
+(`BROWSER=` env). A new design is covered with no workflow edit. The `all-green` job aggregates everything.
 
 Classic must stay pixel-identical to the pre-switcher site. `tools/capture-golden.js` and
 `tools/compare-golden.js` freeze and diff screenshots plus section text (local tool; needs ImageMagick).

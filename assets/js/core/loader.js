@@ -123,28 +123,48 @@
     });
   }
 
-  /* A design's stylesheet is fetched while the old design is still on screen, so
-     it is added with media="not all" (downloaded, not applied) and switched on
-     by activateStyles() the moment the old design is gone. Without this the new
-     CSS would restyle the old page for a moment. */
+  /* A design's stylesheet is *preloaded* while the old design is still on screen
+     (downloaded, not applied) and turned into a real stylesheet by applyStyles()
+     once the old design is gone, so the new CSS never restyles the old page.
+     rel=preload fires onload in every engine; a media="not all" stylesheet does
+     not in WebKit, which made slow switches time out on Safari. */
   function loadStyle(id, href) {
     return new Promise(function (resolve, reject) {
-      var existing = document.head.querySelector('link[data-design-css="' + id + '"][href="' + href + '"]');
-      if (existing) { resolve(existing); return; }
+      if (document.head.querySelector('link[data-design-css="' + id + '"][href="' + href + '"]')) { resolve(); return; }
+      var existing = document.head.querySelector('link[data-design-preload="' + id + '"][href="' + href + '"]');
+      if (existing) { resolve(); return; }
       var l = document.createElement('link');
-      l.rel = 'stylesheet';
+      l.rel = 'preload';
+      l.as = 'style';
       l.href = href;
-      l.media = 'not all';
-      l.setAttribute('data-design-css', id);
-      l.onload = function () { resolve(l); };
+      l.setAttribute('data-design-preload', id);
+      l.onload = function () { resolve(); };
       l.onerror = function () { reject(new Error('Could not load ' + href)); };
       document.head.appendChild(l);
     });
   }
 
-  function activateStyles(id) {
-    var links = document.head.querySelectorAll('link[data-design-css="' + id + '"]');
-    for (var i = 0; i < links.length; i++) links[i].removeAttribute('media');
+  /* Turn the preloaded files into stylesheets and wait (briefly; they are cached)
+     until they apply, so the design never mounts unstyled. */
+  function applyStyles(id) {
+    var pre = document.head.querySelectorAll('link[data-design-preload="' + id + '"]');
+    var waits = [];
+    for (var i = 0; i < pre.length; i++) {
+      (function (node) {
+        var href = node.getAttribute('href');
+        if (document.head.querySelector('link[rel="stylesheet"][data-design-css="' + id + '"][href="' + href + '"]')) return;
+        waits.push(new Promise(function (resolve) {
+          var l = document.createElement('link');
+          l.rel = 'stylesheet';
+          l.href = href;
+          l.setAttribute('data-design-css', id);
+          l.onload = l.onerror = function () { resolve(); };
+          document.head.appendChild(l);
+          window.setTimeout(resolve, 1500);
+        }));
+      })(pre[i]);
+    }
+    return Promise.all(waits);
   }
 
   /* Web fonts are an enhancement: they are requested but never awaited, so an
@@ -177,7 +197,7 @@
   }
 
   function removeStyles(id) {
-    var links = document.head.querySelectorAll('link[data-design-css="' + id + '"]');
+    var links = document.head.querySelectorAll('link[data-design-css="' + id + '"],link[data-design-preload="' + id + '"]');
     for (var i = 0; i < links.length; i++) links[i].parentNode.removeChild(links[i]);
   }
 
@@ -268,7 +288,6 @@
       app.innerHTML = '';
     }
     app.setAttribute('data-mounted', id);
-    activateStyles(id);
 
     var life = createLife();
     state.life = life;
@@ -284,6 +303,20 @@
     window.dispatchEvent(new CustomEvent('portfolio:mounted', { detail: { id: id } }));
   }
 
+  /* Replace what is on screen with design `id`, whose stylesheet is preloaded.
+     #app stays hidden for the few milliseconds between removing the old design's
+     CSS and applying the new one, so nothing is ever shown unstyled. Resolves
+     false when a newer request took over in the meantime. */
+  function swapTo(id, token) {
+    root.setAttribute('data-design-loading', '');
+    unmountCurrent(id);
+    return applyStyles(id).then(function () {
+      if (token !== undefined && token !== state.token) return false;
+      runDesign(id);
+      return true;
+    });
+  }
+
   /* Falls back to Classic, whatever went wrong. */
   function fallbackToClassic(reason, requested, token) {
     // A newer request (a click on another design) owns the page now; do not undo it.
@@ -295,11 +328,12 @@
       if (token !== undefined && token !== state.token) return;
       state.pending = false;
       window.clearTimeout(state.timer);
-      unmountCurrent('classic');
-      runDesign('classic');
-      settle('classic');
-      var label = (R.get(requested) || {}).name || requested;
-      showBanner('The "' + label + '" design could not be loaded, so you are seeing Classic.');
+      return swapTo('classic', token).then(function (ran) {
+        if (!ran) return;
+        settle('classic');
+        var label = (R.get(requested) || {}).name || requested;
+        showBanner('The "' + label + '" design could not be loaded, so you are seeing Classic.');
+      });
     }).catch(function (err) {
       if (token !== undefined && token !== state.token) return;
       state.pending = false;
@@ -354,17 +388,14 @@
       window.clearTimeout(timer);
       state.pending = false;
       var previous = state.id;
-      unmountCurrent(id);
-      try {
-        runDesign(id);
-      } catch (err) {
-        return fallbackToClassic(err.message, id, token);
-      }
-      settle(id);
-      if (opts.keepPosition) restorePosition(section);
-      if (previous !== id) {
-        window.dispatchEvent(new CustomEvent('portfolio:designchange', { detail: { id: id, previous: previous } }));
-      }
+      return swapTo(id, token).then(function (ran) {
+        if (!ran) return;
+        settle(id);
+        if (opts.keepPosition) restorePosition(section);
+        if (previous !== id) {
+          window.dispatchEvent(new CustomEvent('portfolio:designchange', { detail: { id: id, previous: previous } }));
+        }
+      });
     }).catch(function (err) {
       window.clearTimeout(timer);
       if (timedOut || token !== state.token) return;

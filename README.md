@@ -166,11 +166,17 @@ itself, so CI *reports* after the fact; a red run means something live needs fix
 | Static meta | `node tools/sync-meta.js` | canonical, social image, JSON-LD, sitemap, manifest drifting from `data.js` |
 | Published files | `node tools/check-published.js` | forbidden names, phone-like numbers, PDF text layers, photo EXIF, size budgets, broken references |
 | View-model | `node tools/test-view-model.js` | tenure, sorting, totals, empty data |
-| Per design | `DESIGN=<id> node tools/verify-design.js` | every datum shown, injected data appears, a11y, overflow at four widths, both themes, switch leaks |
-| Switching | `node tools/verify-switching.js` | live switch, scroll and focus kept, fallbacks, no-JS, `file://` |
+| Per design | `DESIGN=<id> node tools/verify-design.js` | every datum shown, injected data appears, a11y + axe-core (WCAG A/AA), overflow at four widths, both themes, switch leaks |
+| Switching | `node tools/verify-switching.js` | live switch, scroll and focus kept, keyboard picker, fallbacks, stuck loads, no-JS, `file://` |
 | Browser suites | `node tools/verify-browser.js`, `node tools/verify-devices.js` | 98 + 90 checks across devices, touch targets, themes |
+| Guards | `node tools/test-guards.js [--browser]` | breaks the code on purpose (leaked timer, hard-coded colour, drifted canonical, forbidden name, 404ing script, ...) and fails unless the intended check goes red |
 
-The browser suites need Playwright, which is *not* a dependency of the site: `npm install --no-save playwright`.
+The browser suites need Playwright, which is *not* a dependency of the site: `npm install --no-save playwright axe-core`
+(one command: a second `--no-save` install prunes the first). `BROWSER=firefox|webkit` picks the engine (default Chromium);
+CI runs the per-design and switching suites on all three. `node tools/serve.js 8099` is the concurrent static server the
+suites use (Python's `http.server` is single-threaded and makes WebKit crawl). The `all-green` CI job is the one to require
+in branch protection. axe findings in Classic's dark theme are a recorded baseline in `tools/design-baselines.json`
+(`axe`), which may shrink but not grow; new designs have none.
 Classic is guarded by a pixel diff against its pre-switcher screenshots
 (`tools/capture-golden.js` + `tools/compare-golden.js`, a local tool that needs ImageMagick).
 

@@ -18,7 +18,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { chromium } = require('playwright');
+const { launch, phoneContext, NAME: BROWSER_NAME } = require('./lib/browser');
 const { listDesigns } = require('./list-designs');
 const { pageUrl } = require('./lib/urls');
 
@@ -148,7 +148,7 @@ async function openPage(ctx, design, page, extra) {
     p._errors.push(m.type() + ': ' + t);
   });
   await p.goto(pageUrl(BASE, page, Object.assign({ design, switcher: false }, extra || {})), { waitUntil: 'load' });
-  await p.waitForFunction((id) => document.documentElement.dataset.designReady === id, design, { timeout: 8000 });
+  await p.waitForFunction((id) => document.documentElement.dataset.designReady === id, design, { timeout: 20000 });
   await p.waitForTimeout(500);
   return p;
 }
@@ -287,6 +287,40 @@ async function verifyDesign(browser, manifest, others, baselines) {
     await ctx.close();
   }
 
+  /* axe-core: WCAG 2 A/AA rules (contrast, names, roles, landmarks) in both themes. Only
+     serious/critical findings fail, and Classic's pre-existing ones are a recorded baseline
+     that may shrink but not grow. Needs `npm install --no-save axe-core`. */
+  {
+    let axeSource = null;
+    // axe measures computed styles and lazy images, which differ by engine; its rules are engine-neutral, so Chromium is the reference.
+    if (BROWSER_NAME === 'chromium') { try { axeSource = require('axe-core').source; } catch (e) { /* optional locally, installed in CI */ } }
+    if (!axeSource) {
+      lines.push(`SKIP  [${id}] axe runs on Chromium with axe-core installed (npm install --no-save axe-core)`);
+    } else {
+      const found = {};
+      for (const theme of THEMES) {
+        // Reduced motion: no fade-in is mid-flight when contrast is measured.
+        const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+        await ctx.addInitScript((t) => { try { localStorage.setItem('nqp-theme', t); } catch (e) {} }, theme);
+        const p = await openPage(ctx, id, pages[0], { switcher: true });
+        await p.waitForTimeout(600);
+        await p.addScriptTag({ content: axeSource });
+        const res = await p.evaluate(async () => {
+          const r = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] }, resultTypes: ['violations'] });
+          return r.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
+            .map((v) => ({ id: v.id, n: v.nodes.length, sample: v.nodes[0].target.join(' ').slice(0, 80) }));
+        });
+        res.forEach((v) => { found[v.id] = found[v.id] || { n: 0, sample: theme + ': ' + v.sample }; found[v.id].n += v.n; });
+        await ctx.close();
+      }
+      const known = (baselines[id] && baselines[id].axe) || [];
+      const fresh = Object.keys(found).filter((k) => !known.includes(k));
+      check(id, 'axe: no new serious or critical WCAG A/AA violations in either theme', fresh.length === 0,
+        fresh.map((k) => `${k} x${found[k].n} (${found[k].sample})`).join(' ; '));
+      if (UPDATE_BASELINE && Object.keys(found).length) baselines[id] = Object.assign(baselines[id] || {}, { axe: Object.keys(found) });
+    }
+  }
+
   /* Data injection: a design must show what is added to data.js, without edits. */
   {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
@@ -357,7 +391,7 @@ async function verifyDesign(browser, manifest, others, baselines) {
   /* CSS invariants. */
   {
     const lint = lintCss(manifest);
-    const base = baselines[id];
+    const base = baselines[id] && baselines[id].literals !== undefined ? baselines[id] : null;
     if (base) {
       check(id, `[data-theme] component rules did not grow (baseline ${base.componentTheme})`, lint.componentTheme.length <= base.componentTheme, lint.componentTheme.slice(0, 3).join(' ; '));
       check(id, `colour literals outside token blocks did not grow (baseline ${base.literals})`, lint.literals <= base.literals, `now ${lint.literals}`);
@@ -365,15 +399,15 @@ async function verifyDesign(browser, manifest, others, baselines) {
       check(id, 'light theme redefines tokens only (no [data-theme] component rules)', lint.componentTheme.length === 0, lint.componentTheme.slice(0, 3).join(' ; '));
       check(id, 'no colour literals outside token blocks (strict for new designs)', lint.literals === 0, `${lint.literals} found`);
     }
-    if (UPDATE_BASELINE && id === 'classic') baselines.classic = { literals: lint.literals, componentTheme: lint.componentTheme.length };
+    if (UPDATE_BASELINE && id === 'classic') baselines.classic = Object.assign(baselines.classic || {}, { literals: lint.literals, componentTheme: lint.componentTheme.length });
   }
 
   /* The picker lives in this design's nav and works with a thumb. */
   if (others.length) {
-    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    const ctx = await browser.newContext(phoneContext(390, 844));
     const p = await ctx.newPage();
     await p.goto(pageUrl(BASE, 'home', { design: id, switcher: true }), { waitUntil: 'load' });
-    await p.waitForFunction((d) => document.documentElement.dataset.designReady === d, id, { timeout: 8000 });
+    await p.waitForFunction((d) => document.documentElement.dataset.designReady === d, id, { timeout: 20000 });
     const where = await p.evaluate(() => {
       const slot = document.querySelector('[data-design-slot]');
       const t = document.querySelector('.pds-trigger').getBoundingClientRect();
@@ -382,7 +416,7 @@ async function verifyDesign(browser, manifest, others, baselines) {
     check(id, 'phone: the picker sits in the nav slot, on screen, at least 44px tall', where.inSlot && where.h >= 44 && where.onScreen, JSON.stringify(where));
     await p.tap('.pds-trigger');
     await p.tap(`.pds-opt[data-design-id="${others[0]}"]`);
-    await p.waitForFunction((d) => window.Portfolio.current() === d, others[0], { timeout: 8000 });
+    await p.waitForFunction((d) => window.Portfolio.current() === d, others[0], { timeout: 20000 });
     const after = await p.evaluate(() => ({ closed: document.querySelector('.pds-panel').hidden, scroll: document.documentElement.scrollWidth - innerWidth }));
     check(id, 'phone: picking a design switches it, closes the list, no overflow', after.closed && after.scroll <= 1, JSON.stringify(after));
     await ctx.close();
@@ -402,8 +436,14 @@ async function verifyDesign(browser, manifest, others, baselines) {
         await window.Portfolio.switchDesign(a);
       }
     }, { a: id, b: other, n: CYCLES });
-    await p.waitForTimeout(2000);
-    const after = await p.evaluate(() => window.__snap());
+    // Frames and timers can still be mid-flight a moment after the last switch; a real leak
+    // never settles, so wait (up to 8 s) for the footprint to come back before judging it.
+    let after = null;
+    for (let i = 0; i < 16; i++) {
+      await p.waitForTimeout(500);
+      after = await p.evaluate(() => window.__snap());
+      if (Math.abs(after.raf - before.raf) <= 2 && Math.abs(after.timers - before.timers) <= 2) break;
+    }
     const same = (k, tol) => Math.abs(after[k] - before[k]) <= tol;
     const detail = JSON.stringify({ before, after });
     check(id, `leak: document/window listeners unchanged after ${CYCLES} switches`, same('listeners', 0), detail);
@@ -422,7 +462,7 @@ async function verifyDesign(browser, manifest, others, baselines) {
   const designs = listDesigns();
   const only = process.env.DESIGN;
   const baselines = fs.existsSync(BASELINE_FILE) ? JSON.parse(fs.readFileSync(BASELINE_FILE, 'utf8')) : {};
-  const browser = await chromium.launch();
+  const browser = await launch();
 
   for (const m of designs) {
     if (only && m.id !== only) continue;
