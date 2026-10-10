@@ -171,6 +171,14 @@ if (fs.existsSync(path.join(root, 'manifest.json'))) {
   checkRefs('manifest.json', fs.readFileSync(path.join(root, 'manifest.json'), 'utf8'), /"(?:src|start_url|url)"\s*:\s*"([^"]+)"/g);
 }
 
+/* The host comes from data.js (site.url), so moving the site is one edit. */
+const ORIGIN = (() => {
+  const sandbox = { window: {} };
+  require('vm').createContext(sandbox);
+  require('vm').runInContext(fs.readFileSync(path.join(root, 'assets/js/data.js'), 'utf8'), sandbox);
+  return sandbox.window.PORTFOLIO.site.url.replace(/\/?$/, '/');
+})();
+
 /* ── 5. sitemap and robots ────────────────────────────────────────────────── */
 if (!fs.existsSync(path.join(root, 'sitemap.xml'))) fail('sitemap.xml is missing');
 else {
@@ -178,8 +186,8 @@ else {
   const locs = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
   if (!locs.length) fail('sitemap.xml has no <loc> entries');
   for (const loc of locs) {
-    if (!/^https:\/\/pdz1804\.github\.io\//.test(loc)) { fail(`sitemap.xml: unexpected host in ${loc}`); continue; }
-    const p = loc.replace(/^https:\/\/pdz1804\.github\.io\/?/, '');
+    if (!loc.startsWith(ORIGIN)) { fail(`sitemap.xml: ${loc} is not under ${ORIGIN} (site.url in data.js)`); continue; }
+    const p = loc.slice(ORIGIN.length);
     if (p && !fs.existsSync(path.join(root, p))) fail(`sitemap.xml: ${loc} has no matching file`);
   }
 }

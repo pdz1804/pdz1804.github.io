@@ -169,7 +169,8 @@ const TEXT_OF_DATA = () => {
   D.honors.forEach((h) => { need('honor', h.title); });
   const sorted = D.certifications.slice().sort((a, b) => b.sortKey - a.sortKey);
   sorted.slice(0, D.certsVisible).forEach((c) => need('cert', c.name));
-  const hasAll = new RegExp('\\b' + D.certifications.length + '\\b').test(app);
+  // Not \b: textContent runs a heading straight into the next element ("Certifications37 ...").
+  const hasAll = new RegExp('(^|[^0-9])' + D.certifications.length + '([^0-9]|$)').test(app);
   if (!hasAll) missing.push('certification total ' + D.certifications.length + ' not shown');
   return missing;
 };

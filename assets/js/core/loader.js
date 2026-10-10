@@ -298,16 +298,20 @@
     });
   }
 
-  /* Pages a design cannot render send the visitor somewhere that can. */
+  /* Pages a design cannot render send the visitor somewhere that can. Every
+     query parameter the visitor arrived with (such as ?switcher=0) is kept. */
   function redirectFor(manifest) {
     if (!manifest.pages || manifest.pages.indexOf(page) >= 0) return false;
     var target = manifest.redirect && manifest.redirect[page];
     if (!target) return false;
-    var join = target.indexOf('?') >= 0 ? '&' : '?';
     var hash = '';
     var h = target.indexOf('#');
     if (h >= 0) { hash = target.slice(h); target = target.slice(0, h); }
-    window.location.replace(target + join + 'design=' + encodeURIComponent(manifest.id) + hash);
+    var params = new URLSearchParams(target.indexOf('?') >= 0 ? target.slice(target.indexOf('?')) : '');
+    target = target.split('?')[0];
+    new URLSearchParams(window.location.search).forEach(function (v, k) { params.set(k, v); });
+    params.set('design', manifest.id);
+    window.location.replace(target + '?' + params.toString() + hash);
     return true;
   }
 

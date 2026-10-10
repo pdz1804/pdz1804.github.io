@@ -36,6 +36,9 @@ jobs:
       - name: Validate content data
         run: node tools/validate-data.js
 
+      - name: Static meta tags match data.js
+        run: node tools/sync-meta.js
+
       - name: View-model unit tests
         run: node tools/test-view-model.js
 
@@ -135,6 +138,11 @@ jobs:
         env:
           TARGET: http://127.0.0.1:8099
         run: node tools/verify-browser.js
+
+      - name: Switching and fallback suite
+        env:
+          TARGET: http://127.0.0.1:8099
+        run: node tools/verify-switching.js
 
       # verify-devices.js defaults to the live site; TARGET points it at the local copy.
       - name: Device suite

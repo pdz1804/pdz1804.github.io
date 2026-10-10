@@ -91,10 +91,24 @@
 
   /* The static <link data-design-css="classic"> is in the HTML so no-JS visitors
      get a styled page. Any other design drops it here, before first paint. */
+  var removedCss = [];
   if (chosen !== 'classic') {
     var staticCss = document.querySelectorAll('link[data-design-css="classic"]');
-    for (var i = 0; i < staticCss.length; i++) staticCss[i].parentNode.removeChild(staticCss[i]);
+    for (var i = 0; i < staticCss.length; i++) {
+      removedCss.push({ node: staticCss[i], parent: staticCss[i].parentNode, next: staticCss[i].nextSibling });
+      staticCss[i].parentNode.removeChild(staticCss[i]);
+    }
   }
+
+  /* Last line of defence: if loader.js never runs (blocked, 404, syntax error),
+     nothing else can lift data-design-loading, which would leave the page
+     invisible. After the loader's own 5 s limit plus a margin, reveal the static
+     Classic skeleton and put its stylesheet back. */
+  window.setTimeout(function () {
+    if (root.hasAttribute('data-design-ready')) return;
+    root.removeAttribute('data-design-loading');
+    removedCss.forEach(function (r) { r.parent.insertBefore(r.node, r.next); });
+  }, 7000);
 
   window.PortfolioBoot = {
     design: chosen,

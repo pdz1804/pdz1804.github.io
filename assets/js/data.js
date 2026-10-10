@@ -748,7 +748,7 @@ const PORTFOLIO = {
   /* ─── Site settings (not résumé content) ────────────────────────────── */
   site: {
     defaultDesign: 'classic',            // shown to first-time visitors
-    designs: ['classic', 'dossier'],           // allow-list + picker order; ids from designs/registry.js
+    // designs: ['classic', 'dossier'],   // optional allow-list and picker order; default is every design in designs/registry.js
     switcher: { enabled: true },        // the on-page design picker; ?switcher=1 / 0 overrides
     url: 'https://pdz1804.github.io/',   // canonical origin, used by tools/sync-meta.js and checks
     ogImage: 'images/PDZ.jpg',
