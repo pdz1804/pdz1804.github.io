@@ -175,8 +175,8 @@ The browser suites need Playwright, which is *not* a dependency of the site: `np
 (one command: a second `--no-save` install prunes the first). `BROWSER=firefox|webkit` picks the engine (default Chromium);
 CI runs the per-design and switching suites on all three. `node tools/serve.js 8099` is the concurrent static server the
 suites use (Python's `http.server` is single-threaded and makes WebKit crawl). The `all-green` CI job is the one to require
-in branch protection. axe findings in Classic's dark theme are a recorded baseline in `tools/design-baselines.json`
-(`axe`), which may shrink but not grow; new designs have none.
+in branch protection. Every design must be free of serious or critical axe findings in both themes (Classic's
+text-colour tokens were darkened/lightened in 2026-10 to reach WCAG AA, so it has no baseline for this).
 Classic is guarded by a pixel diff against its pre-switcher screenshots
 (`tools/capture-golden.js` + `tools/compare-golden.js`, a local tool that needs ImageMagick).
 

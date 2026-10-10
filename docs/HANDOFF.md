@@ -213,9 +213,14 @@ TARGET=http://127.0.0.1:8099 node tools/verify-devices.js       # 90 checks
 ```
 
 `node tools/test-guards.js --browser` injects faults and requires each to be caught; run it after changing a suite.
-`BROWSER=firefox|webkit` runs verify-design / verify-switching on another engine. Known: Classic has
-pre-existing dark-theme colour-contrast findings (baselined in `design-baselines.json`, not fixed because that
-would change Classic's look); axe is skipped on WebKit (false positives).
+`BROWSER=firefox|webkit` runs verify-design / verify-switching on another engine; axe is skipped on WebKit
+(false positives).
+
+**Classic contrast (2026-10-10, owner-approved).** Classic used to fail WCAG AA colour contrast (134 nodes). Four
+tokens in `assets/css/main.css` were nudged: dark `--t-low` #64748b to #8190a6; light `--t-low` to #556579,
+`--accent` #0284c7 to #0273ad, `--ok` #059669 to #047857. The tinted `rgba(2,132,199,...)` backgrounds were left
+alone. This is the one deliberate departure from "Classic is pixel-identical"; the golden baseline in
+`tools/golden/before` now differs by exactly those text colours. Do not lighten these tokens again.
 
 `tools/verify-sw-eviction.js` needs both trees prepared first; see the header
 comment in that file.

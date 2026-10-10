@@ -21,7 +21,8 @@ non-zero on error.
 The page is drawn by a *design* (`designs/<id>/`), chosen live by the on-page picker; all of them draw the
 same `data.js`. Read `docs/DESIGNS.md` before touching `assets/js/core/` or any design. Shared derived
 numbers live in `assets/js/core/view-model.js`, never in a design. **Classic must stay pixel-identical**
-(`tools/capture-golden.js` / `compare-golden.js`). New design: `node tools/new-design.js <id> "<Name>"`.
+(`tools/capture-golden.js` / `compare-golden.js`) except for the 2026-10-10 text-contrast token fix in
+`docs/HANDOFF.md`. New design: `node tools/new-design.js <id> "<Name>"`.
 After changing `site.url` or the profile identity run `node tools/sync-meta.js --write`.
 
 ## Invariants

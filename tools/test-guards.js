@@ -53,6 +53,8 @@ const CASES = [
     edits: [{ file: 'designs/dossier/design.js', find: "section('skills', '03'", replace: "section('skillz', '03'" }] },
   { browser: true, name: 'Dossier text drops below WCAG contrast', run: ['tools/verify-design.js'], env: { DESIGN: 'dossier' }, expect: /FAIL\s+\[dossier\] axe/,
     edits: [{ file: 'designs/dossier/main.css', find: '.ccard small{display:block;', replace: '.ccard small{opacity:.45;display:block;' }] },
+  { browser: true, name: 'Classic text colour slips back below WCAG contrast', run: ['tools/verify-design.js'], env: { DESIGN: 'classic' }, expect: /FAIL\s+\[classic\] axe/,
+    edits: [{ file: 'assets/css/main.css', find: '--t-low:  #8190a6;', replace: '--t-low:  #64748b;' }] },
   { browser: true, name: 'Classic stops rendering honors', run: ['tools/verify-design.js'], env: { DESIGN: 'classic' }, expect: /FAIL\s+\[classic\] home: every experience/,
     edits: [{ file: 'designs/classic/render.js', find: '    renderHonors();\n', replace: '' }] },
   { browser: true, name: 'a design stops calling its unmount handle', run: ['tools/verify-switching.js'], expect: /FAIL\s+the handle returned by mount\(\)/,
