@@ -3,3 +3,4 @@ node_modules/
 package-lock.json
 .swtest-old/
 .swtest-new/
+tools/golden/
