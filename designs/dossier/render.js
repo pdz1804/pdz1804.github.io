@@ -148,7 +148,7 @@
       if (!cur) { card.innerHTML = ''; } else {
       var rows = [['Company', cur.co.company], ['Since', DERIVE.since(cur.r)], ['Location', cur.co.location.split(' · ')[0]],
                   ['Languages', p.languages.map(function (l) {
-                    return (l.flag ? '<span aria-hidden="true">' + l.flag + '</span> ' : '') + l.name + ' (' + l.level + ')';
+                    return (l.code ? '<span class="lang-code" aria-hidden="true">' + l.code + '</span> ' : '') + l.name + ' (' + l.level + ')';
                   }).join(' · ')]];
       card.innerHTML =
         '<div class="now-head"><i class="pulse" aria-hidden="true"></i><span>Now</span></div>' +

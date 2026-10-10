@@ -56,6 +56,21 @@ if (!D.profile.typedRoles || !D.profile.typedRoles.length) {
   fail('profile.typedRoles is empty — the hero role line would stay blank');
 }
 
+/* ── Site settings ────────────────────────────────────────────────────── */
+(function checkSite() {
+  const site = D.site;
+  if (!site) { fail('site block is missing (defaultDesign, url, ogImage, switcher)'); return; }
+  const registrySrc = fs.readFileSync(path.join(__dirname, '..', 'designs', 'registry.js'), 'utf8');
+  const ids = [...registrySrc.matchAll(/id:\s*'([a-z][a-z0-9-]*)'/g)].map((m) => m[1]);
+  if (!ids.length) fail('designs/registry.js lists no designs');
+  const allowed = site.designs && site.designs.length ? site.designs : ids;
+  allowed.forEach((id) => { if (!ids.includes(id)) fail(`site.designs lists "${id}", which is not in designs/registry.js`); });
+  if (!allowed.includes(site.defaultDesign)) fail(`site.defaultDesign "${site.defaultDesign}" is not one of ${allowed.join(', ')}`);
+  if (!/^https?:\/\/[^/\s]+\//.test(site.url || '')) fail(`site.url "${site.url}" must be an absolute URL ending in /`);
+  if (!site.ogImage || !fs.existsSync(path.join(__dirname, '..', site.ogImage))) fail(`site.ogImage "${site.ogImage}" does not exist`);
+  if (!site.switcher || typeof site.switcher.enabled !== 'boolean') fail('site.switcher.enabled must be true or false');
+})();
+
 /* ── Experience ───────────────────────────────────────────────────────── */
 let openRoles = 0;
 

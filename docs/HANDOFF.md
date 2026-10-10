@@ -222,3 +222,24 @@ dataset by tester + BA + PM) and the 30s -> 15s -> 8s latency in two steps; ERP 
 mode, ~1,000 users / ~100 DAU; the Management Portal is described as solo-built and ~2 weeks
 faster customer acceptance; the ICPC Honorable Mention was added to Education. The download is
 now the phone-free **full** CV (2 pages, switched from the 1-page build on 2026-10-09). Edit-in-place only: no entry was duplicated.
+
+
+## Designs and the live switcher (10 October 2026)
+
+The site now loads through a design registry instead of a fixed `render.js`/`ui.js` pair.
+
+- `assets/js/core/boot.js` picks the design (`?design=` then saved `nqp-design` then `site.defaultDesign`) and the
+  theme (`nqp-theme`), and hides `#app` until the design has mounted. It also holds a 7 s last-resort guard so a
+  dead `loader.js` cannot leave the page invisible.
+- `assets/js/core/loader.js` mounts and switches designs, owns the `ctx.life` helper, restores the static
+  Classic skeleton on failure, and keeps the visitor's section and focus across a switch.
+- `index.html` and `projects.html` still contain a complete static Classic page inside `#app`; that is the no-JS
+  and failure fallback and what crawlers read. Do not strip it. `assets/css/main.css` must keep its path
+  (`404.html` links it).
+- `?design=` never writes storage; only the picker does. The picker is a corner button on phones because the full
+  pill covered the mobile menu in landscape.
+- Classic was golden-diffed against the pre-change site (worst case 0.0049 % of pixels). The flag emoji in
+  `profile.languages` stay in Classic; Dossier shows the two-letter `code` instead.
+- `tools/verify-sw-eviction.js` still needs its two prepared trees and is not part of CI.
+
+Details and the contract for new designs: `docs/DESIGNS.md`.

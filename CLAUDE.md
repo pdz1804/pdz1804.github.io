@@ -16,6 +16,14 @@ HTML to add content, stop and re-read the handoff.
 Run `node tools/validate-data.js` after any content edit. No dependencies, exits
 non-zero on error.
 
+## Designs
+
+The page is drawn by a *design* (`designs/<id>/`), chosen live by the on-page picker; all of them draw the
+same `data.js`. Read `docs/DESIGNS.md` before touching `assets/js/core/` or any design. Shared derived
+numbers live in `assets/js/core/view-model.js`, never in a design. **Classic must stay pixel-identical**
+(`tools/capture-golden.js` / `compare-golden.js`). New design: `node tools/new-design.js <id> "<Name>"`.
+After changing `site.url` or the profile identity run `node tools/sync-meta.js --write`.
+
 ## Invariants
 
 - Evidence images (`images/evidence/`) should not show a client or product name from
@@ -37,16 +45,19 @@ non-zero on error.
 
 ## Verifying
 
-CI (`.github/workflows/quality.yml`) runs `validate-data`, `check-published` and both browser
-suites on every push to `main` and every PR. Pages deploys from `main` regardless, so CI reports
+CI (`.github/workflows/quality.yml`) runs `validate-data`, `check-published`, `sync-meta`, the view-model
+test, a per-design contract matrix and both browser suites on every push to `main` and every PR. Pages deploys from `main` regardless, so CI reports
 after the fact; treat a red run as something already live that needs fixing.
 
 ```sh
 node tools/validate-data.js                                     # always
 node tools/check-published.js                                   # always: PDFs, EXIF, forbidden names, refs
 npm install --no-save playwright                                # for the rest
-node tools/verify-browser.js                                    # 67 checks
+node tools/verify-browser.js                                    # 98 checks
 TARGET=https://pdz1804.github.io node tools/verify-devices.js   # 90 checks
+node tools/verify-design.js                                     # every design: data, a11y, themes, switch leaks
+node tools/verify-switching.js                                  # live switching and fallbacks
+node tools/test-view-model.js && node tools/sync-meta.js        # derivations; static meta equals data.js
 ```
 
 Content source of truth is `D:\Personal\CV` — the authoritative file is

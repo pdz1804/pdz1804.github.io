@@ -78,8 +78,8 @@ const PORTFOLIO = {
     availability: 'Currently @ FPT Software AI Center',
 
     languages: [
-      { flag: '🇻🇳', name: 'Vietnamese', level: 'Native' },
-      { flag: '🇬🇧', name: 'English',    level: 'IELTS 6.5' },
+      { flag: '🇻🇳', code: 'VN', name: 'Vietnamese', level: 'Native' },
+      { flag: '🇬🇧', code: 'EN', name: 'English',    level: 'IELTS 6.5' },
     ],
 
     // Set enabled:false to hide the download button everywhere.

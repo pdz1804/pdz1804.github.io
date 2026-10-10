@@ -116,6 +116,7 @@ ul{margin:0;padding:0;list-style:none}
 .now dl div{display:grid;gap:1px;border-top:1px solid color-mix(in srgb,var(--bg) 22%,transparent);padding-top:9px}
 .now dt{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;opacity:.6}
 .now dd{margin:0;font-size:15px}
+.lang-code{font:500 11px var(--f-mono);border:1px solid currentColor;border-radius:4px;padding:0 4px;opacity:.75}
 .stats{display:grid;grid-template-columns:repeat(5,1fr);margin-top:40px;border:1.5px solid var(--ink);border-radius:var(--radius);background:var(--surface);overflow:hidden}
 .stat{padding:18px 20px;border-right:1px solid var(--line)}
 .stat:last-child{border-right:0}
