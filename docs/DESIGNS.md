@@ -2,7 +2,8 @@
 
 The site can look like more than one thing. Each look is a **design**: a folder under
 `designs/` that draws the same data (`assets/js/data.js`) its own way. Visitors switch
-between them with the picker on the page, with no reload and no code edit.
+between them with the picker on the page, with no reload and no code edit. (One exception: on `projects.html`,
+picking a design that has no such page, like Dossier, opens `index.html#projects` instead.)
 
 ```mermaid
 flowchart LR

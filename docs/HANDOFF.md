@@ -61,8 +61,10 @@ slip here.
 - **Skill bar widths come from `level`**, mapped in `SKILL_LEVELS` at the bottom
   of `data.js`. Never hand-tune a percentage.
 - **Every colour is a token.** The light theme is produced solely by redefining
-  tokens in the `[data-theme="light"]` block — there are no
-  `[data-theme=…] .component` overrides, and adding one would break the pattern.
+  tokens in the `[data-theme="light"]` block. Classic still has three
+  `[data-theme=…] .component` rules (logo swapping) and some colour literals; they are recorded in
+  `tools/design-baselines.json` and `tools/verify-design.js` fails if either count grows. New designs are
+  linted strictly, so do not add more.
 - **`service-worker.js` is a tombstone. Do not delete it.** Browsers that visited
   before 14 Jun 2026 still have the old Workbox worker installed and answer
   navigations from its cache; deleting the file strands them on the old site
