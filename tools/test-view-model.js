@@ -57,7 +57,7 @@ check('company with no dated roles has empty tenure', VM.companyTenure({ roles: 
 const unknownIssuer = VM.build(
   Object.assign({}, D, { certifications: [{ issuer: 'nobody', name: 'X', date: '2026', sortKey: 202601 }] }),
   LEVELS, NOW);
-check('unknown issuer falls back to its own name', unknownIssuer.certs[0].issuer.label === 'nobody' && unknownIssuer.certs[0].issuer.badge === '?');
+check('unknown issuer falls back to its own name and initials', unknownIssuer.certs[0].issuer.label === 'nobody' && unknownIssuer.certs[0].issuer.badge === 'NO');
 
 const noOpen = VM.build(
   Object.assign({}, D, { experience: [{ company: 'A', roles: [{ title: 'Old', start: '2020-01', end: '2021-01' }] }] }),

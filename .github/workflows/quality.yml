@@ -42,6 +42,68 @@ jobs:
       - name: Check what the site actually serves
         run: node tools/check-published.js
 
+  # The design list comes from designs/registry.js, so a new design is tested
+  # by the matrix below without anyone editing this file.
+  list:
+    name: list designs
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      ids: ${{ steps.ids.outputs.ids }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - id: ids
+        run: echo "ids=$(node tools/list-designs.js)" >> "$GITHUB_OUTPUT"
+
+  design:
+    name: design contract (${{ matrix.id }})
+    needs: [list, published]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        id: ${{ fromJson(needs.list.outputs.ids) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright (not a repo dependency)
+        run: |
+          npm install --no-save --no-package-lock playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Serve the site locally
+        run: |
+          python3 -m http.server 8099 > /tmp/site.log 2>&1 &
+          for i in $(seq 1 20); do
+            curl --fail --silent http://127.0.0.1:8099/index.html > /dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/site.log
+          exit 1
+
+      - name: Design contract suite
+        env:
+          TARGET: http://127.0.0.1:8099
+          DESIGN: ${{ matrix.id }}
+        run: node tools/verify-design.js
+
+      - name: Keep screenshots when something failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-shots-${{ matrix.id }}
+          path: tools/shots
+          if-no-files-found: ignore
+          retention-days: 7
+
   browser:
     name: browser and device suites
     needs: published

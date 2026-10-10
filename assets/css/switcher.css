@@ -100,10 +100,27 @@
   cursor: pointer;
 }
 
-@media (max-width: 420px) {
-  .pds-label { display: none; }
-  .pds-root { padding-left: 8px; }
+/* Compact screens: a corner button that opens the picker (see switcher.js). */
+.pds-toggle {
+  display: none;
+  width: 44px; height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--pds-fg);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
 }
+.pds-toggle:focus-visible { outline: 2px solid var(--pds-focus); outline-offset: 2px; }
+
+.pds-root[data-compact] { left: 8px; bottom: 8px; transform: none; padding: 2px; }
+.pds-root[data-compact] .pds-toggle { display: grid; place-items: center; }
+.pds-root[data-compact]:not([data-open]) .pds-label,
+.pds-root[data-compact]:not([data-open]) .pds-group { display: none; }
+.pds-root[data-compact][data-open] { padding-right: 8px; }
+.pds-root[data-compact] .pds-label { display: none; }
 
 @media (prefers-reduced-motion: no-preference) {
   .pds-opt { transition: background 0.15s ease, color 0.15s ease; }

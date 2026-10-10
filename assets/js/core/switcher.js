@@ -41,6 +41,16 @@
   group.setAttribute('role', 'radiogroup');
   group.setAttribute('aria-labelledby', 'pds-label');
 
+  /* On phones and short screens the full pill would cover content (menu rows,
+     the bottom of the page), so it starts as a small corner button that opens
+     the picker on demand. */
+  var toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'pds-toggle';
+  toggle.setAttribute('aria-label', 'Choose design');
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.textContent = '◐';
+
   var live = document.createElement('div');
   live.className = 'pds-live';
   live.setAttribute('aria-live', 'polite');
@@ -57,10 +67,24 @@
     return b;
   });
 
+  root.appendChild(toggle);
   root.appendChild(label);
   root.appendChild(group);
   root.appendChild(live);
   document.body.appendChild(root);
+
+  var compact = window.matchMedia('(max-width: 599px), (max-height: 599px)');
+  function setOpen(open) {
+    if (open) root.setAttribute('data-open', ''); else root.removeAttribute('data-open');
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+  function applyCompact() {
+    if (compact.matches) root.setAttribute('data-compact', ''); else root.removeAttribute('data-compact');
+    setOpen(false);
+  }
+  applyCompact();
+  if (compact.addEventListener) compact.addEventListener('change', applyCompact);
+  toggle.addEventListener('click', function () { setOpen(!root.hasAttribute('data-open')); });
 
   function sync() {
     var cur = P.current() || B.design;
@@ -75,8 +99,10 @@
     var name = (R.get(id) || {}).name || id;
     P.switchDesign(id, { persist: true, source: 'picker' }).then(function () {
       sync();
+      if (compact.matches) setOpen(false);
       live.textContent = 'Switched to the ' + name + ' design';
-      if (button) button.focus();
+      if (compact.matches) toggle.focus();
+      else if (button) button.focus();
     });
   }
 

@@ -64,7 +64,6 @@
     id: 'classic',
     name: 'Classic',
     description: 'Centred sections, animated hero, particle field',
-    thumb: 'designs/classic/thumb.webp',
     pages: ['home', 'projects'],
     // The stylesheet stays at its historical path because 404.html links it directly.
     css: ['assets/css/main.css'],
@@ -72,6 +71,24 @@
       'designs/classic/render.js',
       'designs/classic/ui.js',
       'designs/classic/design.js',
+    ],
+  });
+
+  api.add({
+    id: 'dossier',
+    name: 'Dossier',
+    description: 'Profile rail, section index with live counts, filterable lists',
+    pages: ['home'],
+    // The landing page is the whole design, so its projects page is the #projects section.
+    redirect: { projects: 'index.html#projects' },
+    // Web fonts are requested but never awaited (see loader.js).
+    fonts: ['https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap'],
+    css: ['designs/dossier/main.css'],
+    js: [
+      'designs/dossier/derive.js',
+      'designs/dossier/render.js',
+      'designs/dossier/ui.js',
+      'designs/dossier/design.js',
     ],
   });
 

@@ -77,6 +77,13 @@
     var currentRole = allRoles.filter(function (r) { return r.end === null; })
                               .sort(byStartDesc)[0] || allRoles[0] || null;
 
+    var currentCompany = null;
+    if (currentRole) {
+      D.experience.forEach(function (co) {
+        if (co.roles.indexOf(currentRole) >= 0) currentCompany = co;
+      });
+    }
+
     var totals = {
       years:    yearsSince(D.profile.careerStart, now),
       projects: D.projects.professional.length + D.projects.academic.length,
@@ -91,7 +98,7 @@
     var certs = D.certifications.slice()
       .sort(function (a, b) { return b.sortKey - a.sortKey; })
       .map(function (c) {
-        var iss = (D.certIssuers && D.certIssuers[c.issuer]) || { label: c.issuer, badge: '?', cls: '' };
+        var iss = (D.certIssuers && D.certIssuers[c.issuer]) || { label: c.issuer, badge: String(c.issuer).slice(0, 2).toUpperCase(), cls: '' };
         return { cert: c, issuer: iss };
       });
 
@@ -115,6 +122,7 @@
     return {
       totals: totals,
       currentRole: currentRole,
+      currentCompany: currentCompany,
       experience: experience,
       honors: honors,
       certs: certs,

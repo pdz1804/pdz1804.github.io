@@ -119,6 +119,10 @@
     });
   }
 
+  /* A design's stylesheet is fetched while the old design is still on screen, so
+     it is added with media="not all" (downloaded, not applied) and switched on
+     by activateStyles() the moment the old design is gone. Without this the new
+     CSS would restyle the old page for a moment. */
   function loadStyle(id, href) {
     return new Promise(function (resolve, reject) {
       var existing = document.head.querySelector('link[data-design-css="' + id + '"][href="' + href + '"]');
@@ -126,6 +130,7 @@
       var l = document.createElement('link');
       l.rel = 'stylesheet';
       l.href = href;
+      l.media = 'not all';
       l.setAttribute('data-design-css', id);
       l.onload = function () { resolve(l); };
       l.onerror = function () { reject(new Error('Could not load ' + href)); };
@@ -133,9 +138,28 @@
     });
   }
 
+  function activateStyles(id) {
+    var links = document.head.querySelectorAll('link[data-design-css="' + id + '"]');
+    for (var i = 0; i < links.length; i++) links[i].removeAttribute('media');
+  }
+
+  /* Web fonts are an enhancement: they are requested but never awaited, so an
+     offline visitor still gets the design (in its fallback fonts). */
+  function requestFonts(id, urls) {
+    (urls || []).forEach(function (href) {
+      if (document.head.querySelector('link[data-design-css="' + id + '"][href="' + href + '"]')) return;
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = href;
+      l.setAttribute('data-design-css', id);
+      document.head.appendChild(l);
+    });
+  }
+
   var scriptsLoaded = {};
 
   function loadAssets(manifest) {
+    requestFonts(manifest.id, manifest.fonts);
     var styles = (manifest.css || []).map(function (href) { return loadStyle(manifest.id, href); });
     var chain = Promise.all(styles);
     if (!scriptsLoaded[manifest.id] && !R.impl(manifest.id)) {
@@ -238,6 +262,7 @@
       app.innerHTML = '';
     }
     app.setAttribute('data-mounted', id);
+    activateStyles(id);
 
     var life = createLife();
     state.life = life;
