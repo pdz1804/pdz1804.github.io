@@ -70,46 +70,39 @@
     };
   }
 
-  /* ── Rail: profile + navigation, with counts taken from the data ─────── */
-  var NAV_COUNT = function (href) {
-    return ({ '#experience': totals.roles, '#skills': totals.skills, '#honors': totals.honors,
-              '#projects': totals.projects, '#certifications': totals.certs })[href];
-  };
-
-  function renderRail() {
-    var el = mount('rail'); if (!el) return;
+  /* ── Top navigation: the same parts as Classic's bar ─────────────────── */
+  // Logo, section links, CV button, the design picker's slot, theme button and a
+  // burger for small screens. Section counts live in the section headers.
+  function renderNav() {
+    var el = mount('nav'); if (!el) return;
     var p = D.profile;
-    var nav = D.nav.map(function (n, i) {
-      var c = NAV_COUNT(n.href);
-      return '<a href="' + attr(n.href) + '" data-nav><span class="nav-i">' + String(i + 1).padStart(2, '0') + '</span>' +
-             '<span class="nav-l">' + n.label + '</span>' + (c != null ? '<span class="nav-c">' + c + '</span>' : '') + '</a>';
+    var links = D.nav.map(function (n) {
+      return '<a href="' + attr(n.href) + '" data-nav>' + n.label + '</a>';
     }).join('');
-    var links = [
-      { href: p.github,   ico: 'github',   label: 'GitHub',   ext: true },
-      { href: p.linkedin, ico: 'linkedin', label: 'LinkedIn', ext: true },
-      { href: 'mailto:' + p.email, ico: 'mail', label: 'Email' },
-    ].map(function (l) {
-      return '<a class="rail-ico" href="' + attr(l.href) + '"' + (l.ext ? ' target="_blank" rel="noopener"' : '') +
-             ' aria-label="' + l.label + '">' + icon(l.ico) + '</a>';
-    }).join('');
+    var cv = p.resume.enabled
+      ? '<a class="btn solid nav-cta" href="' + attr(p.resume.path) + '" download>' + icon('file') + p.resume.label + '</a>' : '';
 
     el.innerHTML =
-      '<div class="rail-top">' +
-        '<a class="rail-id" href="#hero">' +
-          '<span class="avatar"><span class="avatar-fb" aria-hidden="true">' + p.heroName.first.charAt(0) + p.heroName.last.charAt(0) + '</span>' +
-            '<img src="' + attr(D.about.photo) + '" alt="' + attr(p.fullName) + '" width="56" height="56"></span>' +
-          '<span><b>' + p.displayName + '</b><small>' + p.title + '</small></span>' +
-        '</a>' +
+      '<a class="nav-logo" href="#hero">' +
+        '<span class="avatar"><span class="avatar-fb" aria-hidden="true">' + p.heroName.first.charAt(0) + p.heroName.last.charAt(0) + '</span>' +
+          '<img src="' + attr(D.about.photo) + '" alt="' + attr(p.fullName) + '" width="36" height="36"></span>' +
+        '<span>' + p.displayName + '<span class="dot">.</span></span>' +
+      '</a>' +
+      '<nav class="nav-links" aria-label="Sections">' + links + '</nav>' +
+      '<div class="nav-right">' + cv +
+        '<span class="nav-switch" data-design-slot></span>' +
         '<button class="theme" id="theme" type="button" aria-label="Toggle light and dark theme">' +
           '<svg viewBox="0 0 24 24" ' + S + '><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg>' +
         '</button>' +
-      '</div>' +
-      '<nav class="rail-nav" aria-label="Sections">' + nav + '</nav>' +
-      '<div class="rail-foot">' +
-        '<div class="rail-meta"><span>' + p.company + '</span><span>' + p.location + '</span></div>' +
-        (p.resume.enabled ? '<a class="btn solid wide" href="' + attr(p.resume.path) + '" download>' + icon('file') + p.resume.label + '</a>' : '') +
-        '<div class="rail-links">' + links + '</div>' +
+        '<button class="burger" id="burger" type="button" aria-label="Open menu" aria-controls="mob-menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '</div>';
+
+    var mob = mount('nav-mobile');
+    if (mob) {
+      mob.innerHTML = D.nav.map(function (n) {
+        return '<a href="' + attr(n.href) + '" data-close-menu>' + n.label + '</a>';
+      }).join('') + (p.resume.enabled ? '<a href="' + attr(p.resume.path) + '" download data-close-menu>' + p.resume.label + '</a>' : '');
+    }
   }
 
   /* ── Hero ─────────────────────────────────────────────────────────────── */
@@ -474,7 +467,7 @@
   /* ── Entry point ──────────────────────────────────────────────────────── */
   function renderAll() {
     computeTotals();
-    renderRail(); renderHero(); renderAbout(); renderExperience(); renderSkills();
+    renderNav(); renderHero(); renderAbout(); renderExperience(); renderSkills();
     renderEducation(); renderHonors(); renderProjects(); renderCertifications();
     renderContact(); renderFooter(); renderCounts();
     onUpdate();

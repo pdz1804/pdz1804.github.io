@@ -1,8 +1,14 @@
 /* =============================================================================
    SWITCHER — the on-page design picker.
    =============================================================================
-   A small pill fixed to the bottom of the screen, one radio per installed
-   design. It lives outside #app, so it survives every switch and keeps focus.
+   A small dropdown that lives in the top navigation of whichever design is on
+   screen: a button showing the current design's name, opening a list with one
+   radio per installed design.
+
+   Where it sits: every design's nav provides an empty <span data-design-slot>;
+   the picker moves itself into the current slot after each mount. A design with
+   no slot gets a fixed button in the top-right corner instead, so the picker can
+   never disappear.
 
    Shown when there are at least two designs and either
      ?switcher=1 is in the URL, or
@@ -27,29 +33,39 @@
   var designs = R.list();
   if (!enabled || designs.length < 2) return;
 
-  var root = document.createElement('div');
+  var root = document.createElement('span');
   root.className = 'pds-root';
   root.setAttribute('data-testid', 'design-switcher');
 
-  var label = document.createElement('span');
-  label.className = 'pds-label';
-  label.id = 'pds-label';
-  label.textContent = 'Design';
+  var trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'pds-trigger';
+  trigger.setAttribute('aria-expanded', 'false');
+  trigger.setAttribute('aria-controls', 'pds-panel');
+  trigger.setAttribute('aria-label', 'Choose design');
+
+  var triggerName = document.createElement('span');
+  triggerName.className = 'pds-name';
+  var chevron = document.createElement('span');
+  chevron.className = 'pds-chevron';
+  chevron.setAttribute('aria-hidden', 'true');
+  chevron.textContent = '▾';
+  trigger.appendChild(triggerName);
+  trigger.appendChild(chevron);
+
+  var panel = document.createElement('div');
+  panel.className = 'pds-panel';
+  panel.id = 'pds-panel';
+  panel.hidden = true;
+
+  var heading = document.createElement('div');
+  heading.className = 'pds-heading';
+  heading.id = 'pds-heading';
+  heading.textContent = 'Design';
 
   var group = document.createElement('div');
-  group.className = 'pds-group';
   group.setAttribute('role', 'radiogroup');
-  group.setAttribute('aria-labelledby', 'pds-label');
-
-  /* On phones and short screens the full pill would cover content (menu rows,
-     the bottom of the page), so it starts as a small corner button that opens
-     the picker on demand. */
-  var toggle = document.createElement('button');
-  toggle.type = 'button';
-  toggle.className = 'pds-toggle';
-  toggle.setAttribute('aria-label', 'Choose design');
-  toggle.setAttribute('aria-expanded', 'false');
-  toggle.textContent = '◐';
+  group.setAttribute('aria-labelledby', 'pds-heading');
 
   var live = document.createElement('div');
   live.className = 'pds-live';
@@ -61,37 +77,48 @@
     b.className = 'pds-opt';
     b.setAttribute('role', 'radio');
     b.setAttribute('data-design-id', m.id);
-    if (m.description) b.title = m.description;
-    b.textContent = m.name;
+    var title = document.createElement('span');
+    title.className = 'pds-opt-name';
+    title.textContent = m.name;
+    b.appendChild(title);
+    if (m.description) {
+      var d = document.createElement('span');
+      d.className = 'pds-opt-desc';
+      d.textContent = m.description;
+      b.appendChild(d);
+    }
     group.appendChild(b);
     return b;
   });
 
-  root.appendChild(toggle);
-  root.appendChild(label);
-  root.appendChild(group);
+  panel.appendChild(heading);
+  panel.appendChild(group);
+  root.appendChild(trigger);
+  root.appendChild(panel);
   root.appendChild(live);
-  document.body.appendChild(root);
 
-  var compact = window.matchMedia('(max-width: 599px), (max-height: 599px)');
-  function setOpen(open) {
-    if (open) root.setAttribute('data-open', ''); else root.removeAttribute('data-open');
-    toggle.setAttribute('aria-expanded', String(open));
-  }
-  function applyCompact() {
-    if (compact.matches) root.setAttribute('data-compact', ''); else root.removeAttribute('data-compact');
-    setOpen(false);
-  }
-  applyCompact();
-  if (compact.addEventListener) compact.addEventListener('change', applyCompact);
-  toggle.addEventListener('click', function () { setOpen(!root.hasAttribute('data-open')); });
-  // Escape closes an open compact picker and hands focus back to its button.
-  root.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && compact.matches && root.hasAttribute('data-open')) {
-      setOpen(false);
-      toggle.focus();
+  /* Move into the current design's nav slot, or float in the corner. */
+  function place() {
+    var slot = document.querySelector('[data-design-slot]');
+    var hadFocus = root.contains(document.activeElement);
+    if (slot) {
+      if (root.parentNode !== slot) slot.appendChild(root);
+      root.classList.remove('pds-floating');
+    } else if (root.parentNode !== document.body) {
+      document.body.appendChild(root);
+      root.classList.add('pds-floating');
     }
-  });
+    if (hadFocus && !root.contains(document.activeElement)) trigger.focus();
+  }
+
+  function setOpen(open) {
+    panel.hidden = !open;
+    trigger.setAttribute('aria-expanded', String(open));
+    if (open) {
+      var current = buttons.filter(function (b) { return b.getAttribute('aria-checked') === 'true'; })[0] || buttons[0];
+      current.focus();
+    }
+  }
 
   function sync() {
     var cur = P.current() || B.design;
@@ -100,35 +127,51 @@
       b.setAttribute('aria-checked', String(on));
       b.tabIndex = on ? 0 : -1;
     });
+    triggerName.textContent = (R.get(cur) || {}).name || cur;
   }
 
-  function choose(id, button) {
+  function choose(id) {
     var name = (R.get(id) || {}).name || id;
     P.switchDesign(id, { persist: true, source: 'picker' }).then(function () {
+      place();
       sync();
-      if (compact.matches) setOpen(false);
+      setOpen(false);
       live.textContent = 'Switched to the ' + name + ' design';
-      if (compact.matches) toggle.focus();
-      else if (button) button.focus();
+      trigger.focus();
     });
   }
 
+  trigger.addEventListener('click', function () { setOpen(panel.hidden); });
+
   group.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('.pds-opt');
-    if (b) choose(b.getAttribute('data-design-id'), b);
+    if (b) choose(b.getAttribute('data-design-id'));
   });
 
-  /* Arrow keys move between options, as a radio group should. */
-  group.addEventListener('keydown', function (e) {
+  /* Arrow keys move between options, as a radio group should; Escape closes. */
+  root.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !panel.hidden) {
+      e.stopPropagation();
+      setOpen(false);
+      trigger.focus();
+      return;
+    }
     var keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
-    if (!(e.key in keys)) return;
+    if (panel.hidden || !(e.key in keys)) return;
     e.preventDefault();
     var i = buttons.indexOf(document.activeElement);
     if (i < 0) i = 0;
-    var next = buttons[(i + keys[e.key] + buttons.length) % buttons.length];
-    choose(next.getAttribute('data-design-id'), next);
+    buttons[(i + keys[e.key] + buttons.length) % buttons.length].focus();
   });
 
-  window.addEventListener('portfolio:designchange', sync);
+  /* A click anywhere else closes the list. */
+  document.addEventListener('click', function (e) {
+    if (!panel.hidden && !root.contains(e.target)) setOpen(false);
+  });
+
+  /* Designs re-render #app, which removes the old slot: follow it. */
+  window.addEventListener('portfolio:mounted', function () { place(); sync(); });
+
+  place();
   sync();
 })(window, document);

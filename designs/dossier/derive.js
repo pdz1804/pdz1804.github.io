@@ -2,7 +2,7 @@
    DOSSIER — derivations only this design needs.
    =============================================================================
    Shared figures (totals, tenure, current role, sort orders) come from ctx.vm.
-   What lives here is specific to Dossier's layout: the rail's section counts,
+   What lives here is specific to Dossier's layout: the section counts,
    the single project list its filters work on, ranked technology tags, and the
    "Since Nov 2025" label on the hero card.
 
@@ -20,7 +20,7 @@
     return s ? MONTHS[s.m - 1] + ' ' + s.y : '';
   }
 
-  /* Counts shown beside the rail links and in section headers. */
+  /* Counts shown in section headers. */
   function counts(D, vm) {
     return {
       roles: D.experience.reduce(function (n, c) { return n + c.roles.length; }, 0),

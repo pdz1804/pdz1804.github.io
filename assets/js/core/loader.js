@@ -281,6 +281,7 @@
     root.setAttribute('data-design', id);
     root.removeAttribute('data-design-loading');
     root.setAttribute('data-design-ready', id);
+    window.dispatchEvent(new CustomEvent('portfolio:mounted', { detail: { id: id } }));
   }
 
   /* Falls back to Classic, whatever went wrong. */

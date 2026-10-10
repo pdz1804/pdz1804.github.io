@@ -77,7 +77,7 @@
   api.add({
     id: 'dossier',
     name: 'Dossier',
-    description: 'Profile rail, section index with live counts, filterable lists',
+    description: 'Editorial layout with live section counts and filterable lists',
     pages: ['home'],
     // The landing page is the whole design, so its projects page is the #projects section.
     redirect: { projects: 'index.html#projects' },

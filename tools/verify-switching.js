@@ -25,6 +25,7 @@ const out = [];
 let failed = 0;
 const t = (n, ok, d) => { if (!ok) failed++; out.push((ok ? 'PASS' : 'FAIL') + '  ' + n + (d ? '  [' + String(d).slice(0, 240) + ']' : '')); };
 const url = (page, o) => pageUrl(BASE, page, Object.assign({ extra: { v: String(Date.now() + Math.random()) } }, o));
+const pick = async (p, id) => { await p.click('.pds-trigger'); await p.click(`.pds-opt[data-design-id="${id}"]`); };
 const ready = (p, id) => p.waitForFunction((d) => document.documentElement.dataset.designReady === d, id, { timeout: 9000 });
 
 (async () => {
@@ -45,26 +46,27 @@ const ready = (p, id) => p.waitForFunction((d) => document.documentElement.datas
     t('picker lists every design', await p.evaluate(() => document.querySelectorAll('.pds-opt').length) >= 2);
 
     await p.evaluate(() => document.getElementById('experience').scrollIntoView({ behavior: 'instant' }));
-    await p.click(`.pds-opt[data-design-id="${B}"]`);
+    await pick(p, B);
     await p.waitForFunction((d) => window.Portfolio.current() === d, B);
     await p.waitForTimeout(600);
     const s = await p.evaluate((ids) => ({
       aCss: !!document.querySelector(`link[data-design-css="${ids.a}"][href*="css"]`),
       bActive: (() => { const l = document.querySelector(`link[data-design-css="${ids.b}"][href$=".css"]`); return !!l && !l.media; })(),
       q: location.search, saved: localStorage.getItem('nqp-design'), top: Math.round(document.getElementById('experience').getBoundingClientRect().top),
-      focus: document.activeElement && document.activeElement.dataset.designId,
+      focus: document.activeElement && document.activeElement.className,
     }), { a: A, b: B });
     t(`${A} stylesheet removed, ${B} active`, !s.aCss && s.bActive, JSON.stringify(s));
     t('URL updated and choice saved by the picker', s.q.includes('design=' + B) && s.saved === B);
     t('same section kept after the switch', Math.abs(s.top) < 200, 'top=' + s.top);
-    t('focus stays on the picker', s.focus === B);
+    t('focus returns to the picker button', s.focus === 'pds-trigger', s.focus);
+    t('picker sits in the design\'s own nav', await p.evaluate(() => !!document.querySelector('[data-design-slot] .pds-root') && !document.querySelector('.pds-floating')));
 
-    await p.click(`.pds-opt[data-design-id="${A}"]`);
+    await pick(p, A);
     await p.waitForFunction((d) => window.Portfolio.current() === d, A);
     t(`back to ${A} leaves no ${B} stylesheet`, await p.evaluate((b) => !document.querySelector(`link[data-design-css="${b}"]`), B));
 
     await p.evaluate(() => window.PortfolioTheme.set('light'));
-    await p.click(`.pds-opt[data-design-id="${B}"]`);
+    await pick(p, B);
     await p.waitForFunction((d) => window.Portfolio.current() === d, B);
     t('theme carries across designs', await p.evaluate(() => document.documentElement.dataset.theme === 'light'));
 
@@ -88,9 +90,9 @@ const ready = (p, id) => p.waitForFunction((d) => document.documentElement.datas
     const p = await ctx.newPage();
     await p.goto(url('home', { design: A, switcher: true }));
     await ready(p, A);
-    await p.click(`.pds-opt[data-design-id="${B}"]`);          // starts loading slowly
+    await pick(p, B);          // starts loading slowly
     await p.waitForTimeout(150);
-    await p.click(`.pds-opt[data-design-id="${A}"]`);          // changes their mind
+    await p.click(`.pds-opt[data-design-id="${A}"]`);   // list is still open: changes their mind
     await p.waitForTimeout(3500);
     const r = await p.evaluate((ids) => ({
       cur: window.Portfolio.current(), q: location.search, saved: localStorage.getItem('nqp-design'),
@@ -130,16 +132,22 @@ const ready = (p, id) => p.waitForFunction((d) => document.documentElement.datas
     await ctx.close();
   }
 
-  /* ── Escape closes the compact picker ──────────────────────────────────── */
+  /* ── Keyboard: Escape closes the list, arrows move ──────────────────────── */
   {
-    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const p = await ctx.newPage();
     await p.goto(url('home', { design: A, switcher: true }));
     await ready(p, A);
-    await p.tap('.pds-toggle');
+    await p.click('.pds-trigger');
+    const open = await p.evaluate(() => !document.querySelector('.pds-panel').hidden);
+    await p.keyboard.press('ArrowDown');
+    const moved = await p.evaluate(() => document.activeElement.dataset.designId);
     await p.keyboard.press('Escape');
-    const r = await p.evaluate(() => ({ open: document.querySelector('.pds-root').hasAttribute('data-open'), focus: document.activeElement && document.activeElement.className }));
-    t('Escape closes the compact picker and returns focus to its button', !r.open && r.focus === 'pds-toggle', JSON.stringify(r));
+    const r = await p.evaluate(() => ({ closed: document.querySelector('.pds-panel').hidden, focus: document.activeElement.className }));
+    t('picker opens, arrow keys move, Escape closes and returns focus', open && !!moved && r.closed && r.focus === 'pds-trigger', JSON.stringify({ open, moved, r }));
+    await p.click('.pds-trigger');
+    await p.mouse.click(5, 450);
+    t('clicking elsewhere closes the list', await p.evaluate(() => document.querySelector('.pds-panel').hidden));
     await ctx.close();
   }
 

@@ -368,22 +368,23 @@ async function verifyDesign(browser, manifest, others, baselines) {
     if (UPDATE_BASELINE && id === 'classic') baselines.classic = { literals: lint.literals, componentTheme: lint.componentTheme.length };
   }
 
-  /* The picker works with a thumb: corner button, opens, switches, closes. */
+  /* The picker lives in this design's nav and works with a thumb. */
   if (others.length) {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     const p = await ctx.newPage();
     await p.goto(pageUrl(BASE, 'home', { design: id, switcher: true }), { waitUntil: 'load' });
     await p.waitForFunction((d) => document.documentElement.dataset.designReady === d, id, { timeout: 8000 });
-    const closed = await p.evaluate(() => {
-      const r = document.querySelector('.pds-toggle').getBoundingClientRect();
-      return { w: Math.round(r.width), h: Math.round(r.height), opts: getComputedStyle(document.querySelector('.pds-group')).display };
+    const where = await p.evaluate(() => {
+      const slot = document.querySelector('[data-design-slot]');
+      const t = document.querySelector('.pds-trigger').getBoundingClientRect();
+      return { inSlot: !!slot && slot.contains(document.querySelector('.pds-root')), h: Math.round(t.height), onScreen: t.right <= innerWidth && t.left >= 0 && t.top >= 0 && t.bottom <= 100 };
     });
-    check(id, 'phone: picker starts as a 44px corner button', closed.w >= 44 && closed.h >= 44 && closed.opts === 'none', JSON.stringify(closed));
-    await p.tap('.pds-toggle');
+    check(id, 'phone: the picker sits in the nav slot, on screen, at least 44px tall', where.inSlot && where.h >= 44 && where.onScreen, JSON.stringify(where));
+    await p.tap('.pds-trigger');
     await p.tap(`.pds-opt[data-design-id="${others[0]}"]`);
     await p.waitForFunction((d) => window.Portfolio.current() === d, others[0], { timeout: 8000 });
-    const after = await p.evaluate(() => ({ open: document.querySelector('.pds-root').hasAttribute('data-open'), scroll: document.documentElement.scrollWidth - innerWidth }));
-    check(id, 'phone: picker switches the design and closes itself', !after.open && after.scroll <= 1, JSON.stringify(after));
+    const after = await p.evaluate(() => ({ closed: document.querySelector('.pds-panel').hidden, scroll: document.documentElement.scrollWidth - innerWidth }));
+    check(id, 'phone: picking a design switches it, closes the list, no overflow', after.closed && after.scroll <= 1, JSON.stringify(after));
     await ctx.close();
   }
 

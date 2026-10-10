@@ -31,7 +31,7 @@ visitor sees.
 | Design | Dark | Light | Phone |
 |---|---|---|---|
 | **Classic**<br>Centred sections, animated hero, particle field<br>`?design=classic` | <img src="docs/screenshots/designs/classic-dark-desktop.webp" alt="Classic design, dark theme, desktop" width="360"> | <img src="docs/screenshots/designs/classic-light-desktop.webp" alt="Classic design, light theme, desktop" width="360"> | <img src="docs/screenshots/designs/classic-dark-mobile.webp" alt="Classic design, dark theme, phone" width="120"> |
-| **Dossier**<br>Profile rail, section index with live counts, filterable lists<br>`?design=dossier` | <img src="docs/screenshots/designs/dossier-dark-desktop.webp" alt="Dossier design, dark theme, desktop" width="360"> | <img src="docs/screenshots/designs/dossier-light-desktop.webp" alt="Dossier design, light theme, desktop" width="360"> | <img src="docs/screenshots/designs/dossier-dark-mobile.webp" alt="Dossier design, dark theme, phone" width="120"> |
+| **Dossier**<br>Editorial layout with live section counts and filterable lists<br>`?design=dossier` | <img src="docs/screenshots/designs/dossier-dark-desktop.webp" alt="Dossier design, dark theme, desktop" width="360"> | <img src="docs/screenshots/designs/dossier-light-desktop.webp" alt="Dossier design, light theme, desktop" width="360"> | <img src="docs/screenshots/designs/dossier-dark-mobile.webp" alt="Dossier design, dark theme, phone" width="120"> |
 <!-- designs:end -->
 
 Every design supports **light and dark** themes, phone to desktop widths, and reduced motion. Designs only

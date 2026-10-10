@@ -1,9 +1,9 @@
 /* =============================================================================
    DOSSIER — design entry point.
    =============================================================================
-   A fixed profile rail on the left (identity, section index with live counts,
-   links) and one reading column on the right. Every list has filters built
-   from the data, so the page stays scannable as the data grows.
+   A horizontal top bar (logo, section links, CV button, design picker, theme
+   toggle) over one reading column. Every list has filters built from the data,
+   so the page stays scannable as the data grows.
 
    The shell below is the only markup this design owns; render.js fills every
    data-render mount from the data. The landing page is the whole design, so
@@ -21,7 +21,8 @@
   var SHELL =
     '<a class="skip" href="#main">Skip to content</a>' +
     '<div id="progress" aria-hidden="true"></div>' +
-    '<aside class="rail" id="rail" data-render="rail" aria-label="Profile and navigation"></aside>' +
+    '<header class="topnav" id="nav"><div class="topnav-in" data-render="nav"></div></header>' +
+    '<div class="mob-menu" id="mob-menu" data-render="nav-mobile" role="navigation" aria-label="Mobile menu"></div>' +
     '<main id="main" class="content">' +
 
     '<section id="hero" data-testid="hero-section">' +

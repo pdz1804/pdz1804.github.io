@@ -1,69 +1,109 @@
 /* =============================================================================
-   Design switcher + load-failure banner.
+   Design switcher (a dropdown in each design's nav) + load-failure banner.
    Shared by every design, so it carries its own tokens (prefixed --pds-) rather
    than borrowing a design's. Light theme redefines the tokens only.
 ============================================================================= */
 
 :root {
-  --pds-bg: rgba(13, 17, 23, 0.9);
+  --pds-bg: #161b22;
   --pds-fg: #e6edf3;
   --pds-muted: #9aa7b4;
-  --pds-line: rgba(255, 255, 255, 0.16);
+  --pds-line: rgba(255, 255, 255, 0.18);
+  --pds-hover: rgba(255, 255, 255, 0.1);
   --pds-on-bg: #e6edf3;
   --pds-on-fg: #0d1117;
   --pds-focus: #58a6ff;
 }
 
 :root[data-theme="light"] {
-  --pds-bg: rgba(255, 255, 255, 0.92);
+  --pds-bg: #ffffff;
   --pds-fg: #1f2328;
   --pds-muted: #57606a;
   --pds-line: rgba(0, 0, 0, 0.18);
+  --pds-hover: rgba(0, 0, 0, 0.06);
   --pds-on-bg: #1f2328;
   --pds-on-fg: #ffffff;
   --pds-focus: #0969da;
 }
 
+/* The nav slot is empty (and takes no space) until the picker moves in. */
+[data-design-slot]:empty { display: none; }
+
 .pds-root {
-  position: fixed;
-  left: 50%;
-  bottom: 16px;
-  transform: translateX(-50%);
-  z-index: 9000;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: calc(100vw - 32px);
-  padding: 6px 8px 6px 14px;
-  background: var(--pds-bg);
+  position: relative;
+  display: inline-block;
   color: var(--pds-fg);
-  border: 1px solid var(--pds-line);
-  border-radius: 999px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  font: 600 13px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 600 14px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-.pds-label { color: var(--pds-muted); letter-spacing: 0.04em; text-transform: uppercase; font-size: 11px; }
+/* No slot in the design: a fixed button in the top-right corner. */
+.pds-root.pds-floating { position: fixed; top: 12px; right: 12px; z-index: 9000; }
 
-.pds-group { display: flex; gap: 4px; overflow-x: auto; }
-
-.pds-opt {
-  min-height: 44px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 999px;
+.pds-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--pds-line);
+  border-radius: 8px;
   background: transparent;
-  color: var(--pds-fg);
+  color: inherit;
   font: inherit;
   cursor: pointer;
   white-space: nowrap;
 }
-
-.pds-opt:hover { background: var(--pds-line); }
-.pds-opt[aria-checked="true"] { background: var(--pds-on-bg); color: var(--pds-on-fg); }
+.pds-trigger:hover { background: var(--pds-hover); }
+.pds-trigger:focus-visible,
 .pds-opt:focus-visible { outline: 2px solid var(--pds-focus); outline-offset: 2px; }
+.pds-chevron { font-size: 11px; opacity: 0.7; }
+.pds-trigger[aria-expanded="true"] .pds-chevron { transform: rotate(180deg); }
+
+@media (pointer: coarse) {
+  .pds-trigger { min-height: 44px; }
+}
+
+.pds-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 9001;
+  width: 260px;
+  max-width: calc(100vw - 24px);
+  padding: 8px;
+  border: 1px solid var(--pds-line);
+  border-radius: 12px;
+  background: var(--pds-bg);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+.pds-panel[hidden] { display: none; }
+
+.pds-heading {
+  padding: 6px 10px 8px;
+  color: var(--pds-muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pds-opt {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pds-opt:hover { background: var(--pds-hover); }
+.pds-opt[aria-checked="true"] { background: var(--pds-on-bg); color: var(--pds-on-fg); }
+.pds-opt-desc { font-weight: 400; font-size: 12px; line-height: 1.35; opacity: 0.75; }
 
 .pds-live {
   position: absolute;
@@ -75,7 +115,7 @@
 
 .pds-banner {
   position: fixed;
-  left: 16px; right: 16px; top: 12px;
+  left: 16px; right: 16px; bottom: 16px;
   z-index: 9100;
   display: flex;
   align-items: center;
@@ -86,6 +126,7 @@
   color: var(--pds-fg);
   border: 1px solid var(--pds-line);
   border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
   font: 500 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
@@ -100,28 +141,6 @@
   cursor: pointer;
 }
 
-/* Compact screens: a corner button that opens the picker (see switcher.js). */
-.pds-toggle {
-  display: none;
-  width: 44px; height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--pds-fg);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-}
-.pds-toggle:focus-visible { outline: 2px solid var(--pds-focus); outline-offset: 2px; }
-
-.pds-root[data-compact] { left: 8px; bottom: 8px; transform: none; padding: 2px; }
-.pds-root[data-compact] .pds-toggle { display: grid; place-items: center; }
-.pds-root[data-compact]:not([data-open]) .pds-label,
-.pds-root[data-compact]:not([data-open]) .pds-group { display: none; }
-.pds-root[data-compact][data-open] { padding-right: 8px; }
-.pds-root[data-compact] .pds-label { display: none; }
-
-@media (prefers-reduced-motion: no-preference) {
-  .pds-opt { transition: background 0.15s ease, color 0.15s ease; }
+@media (max-width: 420px) {
+  .pds-trigger { padding: 0 10px; }
 }

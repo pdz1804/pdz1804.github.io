@@ -21,11 +21,29 @@
     html.classList.add('js');
     life.cleanup(function () { html.classList.remove('js'); });
 
-    /* Theme: the button belongs to the rail; storage and <html data-theme> belong
+    /* Theme: the button belongs to the top bar; storage and <html data-theme> belong
        to the shared theme service, so both designs agree on the saved choice. */
     life.on(root, 'click', function (e) {
       if (e.target.closest && e.target.closest('#theme')) ctx.theme.toggle();
     });
+
+    /* Mobile menu. */
+    var menu = root.querySelector('#mob-menu'), burger = root.querySelector('#burger');
+    function closeMenu() {
+      if (menu) menu.classList.remove('open');
+      if (burger) burger.setAttribute('aria-expanded', 'false');
+    }
+    life.on(root, 'click', function (e) {
+      var t = e.target.closest ? e.target : null;
+      if (!t || !menu) return;
+      if (t.closest('#burger')) {
+        var open = menu.classList.toggle('open');
+        burger.setAttribute('aria-expanded', String(open));
+      } else if (t.closest('[data-close-menu]') || (menu.classList.contains('open') && !t.closest('#mob-menu'))) {
+        closeMenu();
+      }
+    });
+    life.on(document, 'keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
 
     /* A missing image hides itself; the container keeps its caption and shape. */
     life.on(root, 'error', function (e) {
@@ -70,7 +88,7 @@
       spy();
     }
 
-    /* ── Scroll-spy: highlight the rail link of the section in view ──────── */
+    /* ── Scroll-spy: highlight the nav link of the section in view ──────── */
     var spyIO = null;
     function spy() {
       if (spyIO) spyIO.disconnect();
@@ -97,6 +115,8 @@
       var h = document.documentElement, max = h.scrollHeight - h.clientHeight;
       if (bar) bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(h.scrollTop / max, 1) : 0) + ')';
       if (top) top.classList.toggle('show', h.scrollTop > 700);
+      var nav = root.querySelector('#nav');
+      if (nav) nav.classList.toggle('scrolled', h.scrollTop > 16);
     }
     life.on(window, 'scroll', onScroll, { passive: true });
     onScroll();
