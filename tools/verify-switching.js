@@ -81,6 +81,68 @@ const ready = (p, id) => p.waitForFunction((d) => document.documentElement.datas
     await ctx.close();
   }
 
+  /* ── A slow design the visitor changes their mind about ─────────────────── */
+  {
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    await ctx.route(`**/designs/${B}/*.css`, async (r) => { await new Promise((x) => setTimeout(x, 1800)); r.continue(); });
+    const p = await ctx.newPage();
+    await p.goto(url('home', { design: A, switcher: true }));
+    await ready(p, A);
+    await p.click(`.pds-opt[data-design-id="${B}"]`);          // starts loading slowly
+    await p.waitForTimeout(150);
+    await p.click(`.pds-opt[data-design-id="${A}"]`);          // changes their mind
+    await p.waitForTimeout(3500);
+    const r = await p.evaluate((ids) => ({
+      cur: window.Portfolio.current(), q: location.search, saved: localStorage.getItem('nqp-design'),
+      bCss: !!document.querySelector(`link[data-design-css="${ids.b}"][href$=".css"]`),
+    }), { a: A, b: B });
+    t('switching back during a slow load cancels it (nothing mounts late)', r.cur === A && !r.q.includes('design=' + B) && r.saved !== B, JSON.stringify(r));
+    await ctx.close();
+  }
+
+  /* ── A typo in ?design= beats a saved choice, with a notice ─────────────── */
+  {
+    const ctx = await browser.newContext();
+    await ctx.addInitScript((b) => { try { localStorage.setItem('nqp-design', b); } catch (e) {} }, B);
+    const p = await ctx.newPage();
+    await p.goto(url('home', { design: 'typo-design' }));
+    await p.waitForFunction(() => document.documentElement.dataset.designReady);
+    const r = await p.evaluate(() => ({ cur: window.Portfolio.current(), def: window.PORTFOLIO.site.defaultDesign, banner: document.querySelector('.pds-banner') && document.querySelector('.pds-banner').textContent }));
+    t('invalid ?design= selects the default (not the saved design) and says so', r.cur === r.def && /typo-design/.test(r.banner || ''), JSON.stringify(r));
+    await ctx.close();
+  }
+
+  /* ── A design may return { unmount() } from mount() ─────────────────────── */
+  {
+    const ctx = await browser.newContext();
+    const p = await ctx.newPage();
+    await p.goto(url('home', { design: A, switcher: false }));
+    await ready(p, A);
+    const r = await p.evaluate(async (a) => {
+      window.PortfolioDesigns.add({ id: 'zz-probe', name: 'Probe', pages: ['home', 'projects'], css: [], js: [] });
+      window.PortfolioDesigns.implement('zz-probe', { mount(root) { root.innerHTML = '<main id="main"><h1>probe</h1></main>'; return { unmount() { window.__probeUnmounted = true; } }; } });
+      await window.Portfolio.switchDesign('zz-probe');
+      const mounted = window.Portfolio.current() === 'zz-probe';
+      await window.Portfolio.switchDesign(a);
+      return { mounted, unmounted: window.__probeUnmounted === true };
+    }, A);
+    t('the handle returned by mount() has its unmount() called', r.mounted && r.unmounted, JSON.stringify(r));
+    await ctx.close();
+  }
+
+  /* ── Escape closes the compact picker ──────────────────────────────────── */
+  {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    const p = await ctx.newPage();
+    await p.goto(url('home', { design: A, switcher: true }));
+    await ready(p, A);
+    await p.tap('.pds-toggle');
+    await p.keyboard.press('Escape');
+    const r = await p.evaluate(() => ({ open: document.querySelector('.pds-root').hasAttribute('data-open'), focus: document.activeElement && document.activeElement.className }));
+    t('Escape closes the compact picker and returns focus to its button', !r.open && r.focus === 'pds-toggle', JSON.stringify(r));
+    await ctx.close();
+  }
+
   /* ── Unknown design id ─────────────────────────────────────────────────── */
   {
     const ctx = await browser.newContext();

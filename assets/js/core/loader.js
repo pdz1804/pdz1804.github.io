@@ -40,6 +40,10 @@
     id: null,           // design currently mounted
     life: null,         // its lifecycle helper
     token: 0,           // bumped per switch so a stale async result is ignored
+    pending: false,     // a switch is loading assets and has not mounted yet
+    pendingId: null,    // the design that switch is loading
+    timer: 0,           // that switch's load-timeout handle
+    handle: null,       // whatever the mounted design's mount() returned (may carry unmount())
     skeleton: null,     // pristine Classic markup, captured before anything clears #app
   };
 
@@ -244,7 +248,9 @@
   function unmountCurrent(next) {
     if (!state.id) return;
     var impl = R.impl(state.id);
-    try { if (impl && impl.unmount) impl.unmount(); } catch (e) { /* keep going */ }
+    try { if (state.handle && typeof state.handle.unmount === 'function') state.handle.unmount(); } catch (e) { /* keep going */ }
+    try { if (impl && impl.unmount) impl.unmount(); } catch (e2) { /* keep going */ }
+    state.handle = null;
     if (state.life) state.life.dispose();
     if (state.id !== next) removeStyles(state.id);
     state.id = null;
@@ -267,7 +273,8 @@
     var life = createLife();
     state.life = life;
     state.id = id;
-    impl.mount(app, buildContext(life));
+    state.handle = null;
+    state.handle = impl.mount(app, buildContext(life)) || null;
   }
 
   function settle(id) {
@@ -277,17 +284,24 @@
   }
 
   /* Falls back to Classic, whatever went wrong. */
-  function fallbackToClassic(reason, requested) {
+  function fallbackToClassic(reason, requested, token) {
+    // A newer request (a click on another design) owns the page now; do not undo it.
+    if (token !== undefined && token !== state.token) return Promise.resolve();
     // eslint-disable-next-line no-console
     console.warn('[portfolio] ' + reason);
-    unmountCurrent();
     var manifest = R.get('classic');
     return loadAssets(manifest).then(function () {
+      if (token !== undefined && token !== state.token) return;
+      state.pending = false;
+      window.clearTimeout(state.timer);
+      unmountCurrent('classic');
       runDesign('classic');
       settle('classic');
       var label = (R.get(requested) || {}).name || requested;
       showBanner('The "' + label + '" design could not be loaded, so you are seeing Classic.');
     }).catch(function (err) {
+      if (token !== undefined && token !== state.token) return;
+      state.pending = false;
       // Even Classic failed: reveal the static skeleton, which is a full page.
       // eslint-disable-next-line no-console
       console.error('[portfolio] ' + err.message);
@@ -319,27 +333,31 @@
   function show(id, opts) {
     opts = opts || {};
     var token = ++state.token;
+    window.clearTimeout(state.timer);
     var manifest = R.get(id);
-    if (!manifest) return fallbackToClassic('Unknown design "' + id + '"', id);
+    if (!manifest) return fallbackToClassic('Unknown design "' + id + '"', id, token);
     if (redirectFor(manifest)) return Promise.resolve();
 
     var section = opts.keepPosition ? currentSectionId() : null;
     var timedOut = false;
 
-    var timer = window.setTimeout(function () {
+    state.pending = true;
+    state.pendingId = id;
+    var timer = state.timer = window.setTimeout(function () {
       timedOut = true;
-      if (token === state.token) fallbackToClassic('Design "' + id + '" timed out', id);
+      if (token === state.token) fallbackToClassic('Design "' + id + '" timed out', id, token);
     }, LOAD_TIMEOUT_MS);
 
     return loadAssets(manifest).then(function () {
       if (timedOut || token !== state.token) return;
       window.clearTimeout(timer);
+      state.pending = false;
       var previous = state.id;
       unmountCurrent(id);
       try {
         runDesign(id);
       } catch (err) {
-        return fallbackToClassic(err.message, id);
+        return fallbackToClassic(err.message, id, token);
       }
       settle(id);
       if (opts.keepPosition) restorePosition(section);
@@ -349,7 +367,7 @@
     }).catch(function (err) {
       window.clearTimeout(timer);
       if (timedOut || token !== state.token) return;
-      return fallbackToClassic(err.message, id);
+      return fallbackToClassic(err.message, id, token);
     });
   }
 
@@ -377,13 +395,24 @@
       if (id === 'classic' && state.skeleton !== null) app.setAttribute('data-mounted', 'classic-static');
       return show(id).then(function () {
         if (app.getAttribute('data-mounted') === 'classic-static') app.setAttribute('data-mounted', 'classic');
+        if (B.invalid) {
+          var label = (R.get(state.id) || {}).name || state.id;
+          showBanner('There is no design called "' + B.invalid + '", so you are seeing ' + label + '.');
+        }
       });
     },
 
     switchDesign: function (id, opts) {
       opts = opts || {};
       if (!R.get(id)) return Promise.resolve();
-      if (id === state.id && !opts.force) return Promise.resolve();
+      if (id === state.id && !opts.force) {
+        // Clicking back to what is already on screen cancels a switch still loading.
+        if (state.pending) {
+          state.token++; state.pending = false; window.clearTimeout(state.timer);
+          if (state.pendingId && state.pendingId !== state.id) removeStyles(state.pendingId);
+        }
+        return Promise.resolve();
+      }
       return show(id, { keepPosition: true }).then(function () {
         if (state.id !== id) return;
         setQuery(id);

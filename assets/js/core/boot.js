@@ -78,7 +78,11 @@
   var saved = read(DESIGN_KEY);
   if (saved && !valid(saved)) saved = null;           // a design that was removed
 
-  var chosen = valid(queried) ? queried : (saved || fallback);
+  /* A ?design= that names nothing is a typo or a removed design: it selects the
+     default (not whatever was saved) and the loader tells the visitor. An empty
+     value counts as absent. */
+  var invalid = queried && !valid(queried) ? queried : null;
+  var chosen = valid(queried) ? queried : (invalid ? fallback : (saved || fallback));
 
   root.setAttribute('data-design', chosen);
   root.setAttribute('data-design-loading', '');
@@ -114,6 +118,7 @@
     design: chosen,
     fallback: fallback,
     queried: queried,
+    invalid: invalid,
     theme: theme,
     keys: { theme: THEME_KEY, design: DESIGN_KEY },
     read: read,

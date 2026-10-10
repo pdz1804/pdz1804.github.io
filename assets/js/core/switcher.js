@@ -85,6 +85,13 @@
   applyCompact();
   if (compact.addEventListener) compact.addEventListener('change', applyCompact);
   toggle.addEventListener('click', function () { setOpen(!root.hasAttribute('data-open')); });
+  // Escape closes an open compact picker and hands focus back to its button.
+  root.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && compact.matches && root.hasAttribute('data-open')) {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
 
   function sync() {
     var cur = P.current() || B.design;
