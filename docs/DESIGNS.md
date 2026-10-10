@@ -66,7 +66,8 @@ PortfolioDesigns.implement('aurora', {
 2. **Keep the shared section ids**: `hero about experience skills education honors projects certifications contact`.
    They are how a visitor keeps their place when switching.
 3. **Colours are tokens.** The light theme redefines tokens only: no `[data-theme=…] .component` rules and
-   no colour literals outside `:root` blocks. The contract suite lints this.
+   no colour literals outside `:root` blocks. The contract suite lints this strictly for new designs; Classic
+   has a recorded baseline in `tools/design-baselines.json` that may not grow.
 4. **Derived numbers come from `ctx.vm`**, not re-computed in the design.
 5. **Text fields in `data.js` are trusted HTML** (they carry `<strong>` and entities). URLs and other
    attribute values must be escaped.
@@ -74,8 +75,10 @@ PortfolioDesigns.implement('aurora', {
 
 ## What the platform does for you
 
-- **Fallback:** the HTML ships a complete Classic page inside `#app`. If a design fails to load, takes
-  more than 5 s, or the loader itself dies, the visitor still gets that page (and a banner explains it).
+- **Fallback:** the HTML ships a complete Classic page inside `#app`. If a design fails to load or takes
+  more than 5 s, the loader mounts Classic and shows a banner. If the loader itself dies, a 7 s guard in
+  `boot.js` reveals the static page and its stylesheet (there is no banner in that case, because the banner
+  is the loader's).
 - **Choosing:** `?design=<id>` wins for that visit but is not remembered; only the picker saves a choice
   (`localStorage` key `nqp-design`). Unknown ids fall back to `site.defaultDesign`.
 - **Picker:** shown when `site.switcher.enabled` is true (`?switcher=0` / `?switcher=1` override).

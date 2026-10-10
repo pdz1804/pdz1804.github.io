@@ -165,7 +165,20 @@ const TEXT_OF_DATA = () => {
     co.roles.forEach((r) => { need('role', r.title); r.bullets.forEach((b) => need('bullet', text(b).slice(0, 40))); });
   });
   D.skills.forEach((g) => { need('skill group', g.name); g.items.forEach((s) => need('skill', s.name)); });
-  D.education.forEach((e) => { need('institution', e.institution); need('degree', e.degree); });
+  D.education.forEach((e) => {
+    need('institution', e.institution); need('degree', e.degree);
+    if (e.gpa) need('gpa', e.gpa.value);
+    (e.docs || []).forEach((d) => need('education document', d.label));
+  });
+  D.experience.forEach((co) => co.roles.forEach((r) => (r.awards || []).forEach((a) => need('award', a))));
+  D.about.specialties.forEach((x) => need('specialty', x.title));
+  D.profile.languages.forEach((l) => need('language', l.name));
+  D.nav.forEach((n) => need('nav label', n.label));
+  const attrs = Array.from(document.getElementById('app').querySelectorAll('[href],[src]')).map((e) => e.getAttribute('href') || e.getAttribute('src'));
+  const hasAttr = (v) => attrs.some((a) => a === v || a.endsWith(v));
+  if (!hasAttr(D.about.photo)) missing.push('profile photo ' + D.about.photo);
+  if (D.profile.resume.enabled && !hasAttr(D.profile.resume.path)) missing.push('resume link ' + D.profile.resume.path);
+  [D.profile.github, D.profile.linkedin, 'mailto:' + D.profile.email].forEach((u) => { if (!hasAttr(u)) missing.push('contact link ' + u); });
   D.honors.forEach((h) => { need('honor', h.title); });
   const sorted = D.certifications.slice().sort((a, b) => b.sortKey - a.sortKey);
   sorted.slice(0, D.certsVisible).forEach((c) => need('cert', c.name));
@@ -179,7 +192,14 @@ const PROJECT_TITLES = () => {
   const D = window.PORTFOLIO;
   const text = (html) => new DOMParser().parseFromString(String(html), 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
   const app = document.getElementById('app').textContent.replace(/\s+/g, ' ');
-  return D.projects.professional.concat(D.projects.academic).map((p) => text(p.title)).filter((t) => !app.includes(t));
+  const attrs = Array.from(document.getElementById('app').querySelectorAll('[href]')).map((e) => e.getAttribute('href'));
+  const lost = [];
+  D.projects.professional.concat(D.projects.academic).forEach((p) => {
+    if (!app.includes(text(p.title))) lost.push('title: ' + text(p.title));
+    (p.tags || []).forEach((t) => { if (!app.includes(text(t))) lost.push(text(p.title) + ' tag: ' + t); });
+    if (p.link && !attrs.includes(p.link)) lost.push(text(p.title) + ' link: ' + p.link);
+  });
+  return lost;
 };
 
 /* ── One design ─────────────────────────────────────────────────────────────── */
@@ -200,7 +220,7 @@ async function verifyDesign(browser, manifest, others, baselines) {
 
     if (pg === 'projects' || !pages.includes('projects')) {
       const lost = await p.evaluate(PROJECT_TITLES);
-      check(id, `${pg}: every project title is shown`, lost.length === 0, lost.join(' | '));
+      check(id, `${pg}: every project title, tag and repository link is shown`, lost.length === 0, lost.join(' | '));
     }
 
     check(id, `${pg}: no console errors or page errors`, p._errors.length === 0, p._errors.join(' | '));

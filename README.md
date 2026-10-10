@@ -22,7 +22,7 @@ from it. Add a job, a project or a certification and the counters, the numbering
 ## Designs
 
 The same data, several complete designs. **Use the *Design* picker at the bottom of the page and the whole
-site re-skins instantly**: no reload, nothing to edit. On a phone it is the small ◐ button in the bottom-left
+site re-skins instantly**: no reload, nothing to edit. (The one exception: on the separate `projects.html` page, picking Dossier opens the landing page's Projects section, because Dossier keeps everything on one page.) On a phone it is the small ◐ button in the bottom-left
 corner. Your choice is remembered, and a link with `?design=<id>` opens a specific design for that visit
 (it does not overwrite your saved choice). `site.defaultDesign` in `data.js` only sets what a first-time
 visitor sees.
@@ -179,7 +179,7 @@ Classic is guarded by a pixel diff against its pre-switcher screenshots
 - `sortKey` is an integer `YYYYMM` (`202606`), never a decimal.
 - Exactly one role has `end: null`. Roles render newest first, so `push()` is safe.
 - Skill widths come from `level` through `SKILL_LEVELS`; never hand-tune a percentage.
-- Every colour is a **token**. Themes redefine tokens only; components never hard-code a hex value.
+- Every colour is a **token**. Themes redefine tokens only; components never hard-code a hex value. New designs are linted for this strictly. Classic predates the rule: `tools/design-baselines.json` records its existing exceptions (47 colour literals, 3 `[data-theme]` component rules) and the suite fails if they grow.
 - Photos in `images/evidence/` are metadata-stripped and ≤ 2048 px (phones embed GPS).
 - `service-worker.js` is a tombstone that unregisters an old worker; do not delete it on a site that ever
   shipped one. See [`docs/HANDOFF.md`](docs/HANDOFF.md) for the gotchas learned the hard way.

@@ -79,7 +79,8 @@ const DESIGN_JS = `/* ==========================================================
         return '<article><h3>' + e.company.company + '</h3><p>' + e.tenure + ' · ' + e.company.location + '</p>' +
           e.roles.map(function (r) {
             return '<div><h4>' + r.title + '</h4><p>' + r.period + ' · ' + r.type + '</p><ul>' +
-              r.bullets.map(function (b) { return '<li>' + b + '</li>'; }).join('') + '</ul>' + evidence(r.evidence) + '</div>';
+              r.bullets.map(function (b) { return '<li>' + b + '</li>'; }).join('') + '</ul>' +
+              (r.awards || []).map(function (a) { return '<p>' + a + '</p>'; }).join('') + evidence(r.evidence) + '</div>';
           }).join('') + '</article>';
       }).join('');
 
@@ -90,19 +91,24 @@ const DESIGN_JS = `/* ==========================================================
 
       var education = D.education.map(function (e) {
         return '<article><h3>' + e.institution + '</h3><p>' + e.degree + ' · ' + e.period + '</p><ul>' +
-          e.details.map(function (d) { return '<li>' + d + '</li>'; }).join('') + '</ul></article>';
+          e.details.map(function (d) { return '<li>' + d + '</li>'; }).join('') + '</ul>' +
+          (e.gpa ? '<p>GPA ' + e.gpa.value + ' ' + e.gpa.scale + '</p>' : '') +
+          (e.docs || []).map(function (d) { return '<p><a href="' + attr(d.href) + '">' + d.label + '</a></p>'; }).join('') + '</article>';
       }).join('');
 
       var honors = vm.honors.map(function (h) {
         return '<article><h3>' + h.title + '</h3><p>' + h.date + ' · ' + h.issuer + '</p><p>' + h.description + '</p>' + evidence(h.evidence) + '</article>';
       }).join('');
 
+      function projectExtras(x) {
+        return '<p>' + x.tags.join(' · ') + '</p>' + (x.link ? '<p><a href="' + attr(x.link) + '">Repository</a></p>' : '');
+      }
       var pro = D.projects.professional.map(function (x) {
         return '<article><h3>' + x.title + '</h3><p>' + x.period + '</p><ul>' +
-          x.bullets.map(function (b) { return '<li>' + b + '</li>'; }).join('') + '</ul></article>';
+          x.bullets.map(function (b) { return '<li>' + b + '</li>'; }).join('') + '</ul>' + projectExtras(x) + '</article>';
       }).join('');
       var acad = D.projects.academic.map(function (x) {
-        return '<article><h3>' + x.title + '</h3><p>' + x.period + '</p><p>' + x.desc + '</p></article>';
+        return '<article><h3>' + x.title + '</h3><p>' + x.period + '</p><p>' + x.desc + '</p>' + projectExtras(x) + '</article>';
       }).join('');
 
       var shown = vm.certs.slice(0, D.certsVisible);
@@ -113,10 +119,16 @@ const DESIGN_JS = `/* ==========================================================
       root.innerHTML =
         '<a class="skip" href="#main">Skip to content</a>' +
         '<header class="bar"><strong>' + p.displayName + '</strong>' +
+          '<nav aria-label="Sections">' + D.nav.map(function (n) { return '<a href="' + attr(n.href) + '">' + n.label + '</a>'; }).join(' ') + '</nav>' +
           '<button type="button" id="theme-toggle" aria-label="Toggle light and dark theme">Theme</button></header>' +
         '<main id="main">' +
-          '<section id="hero" class="sec"><h1>' + p.fullName + '</h1><p>' + vm.currentRole.title + '</p><p>' + p.tagline + '</p></section>' +
-          section('about', 'About', D.about.paragraphs.map(function (x) { return '<p>' + x + '</p>'; }).join('')) +
+          '<section id="hero" class="sec"><img src="' + attr(D.about.photo) + '" alt="' + attr(p.fullName) + '" width="96" height="96">' +
+            '<h1>' + p.fullName + '</h1><p>' + vm.currentRole.title + '</p><p>' + p.tagline + '</p>' +
+            '<p>' + p.languages.map(function (l) { return l.name + ' (' + l.level + ')'; }).join(' · ') + '</p>' +
+            (p.resume.enabled ? '<p><a href="' + attr(p.resume.path) + '" download>' + p.resume.label + '</a></p>' : '') + '</section>' +
+          section('about', 'About',
+            D.about.paragraphs.map(function (x) { return '<p>' + x + '</p>'; }).join('') +
+            D.about.specialties.map(function (x) { return '<article><h3>' + x.title + '</h3><p>' + x.desc + '</p></article>'; }).join('')) +
           section('experience', 'Experience', experience) +
           section('skills', 'Skills', skills) +
           section('education', 'Education', education) +
