@@ -744,6 +744,15 @@ const PORTFOLIO = {
 
   /* ─── Hero floating tech badges (decorative) ────────────────────────── */
   floaters: ['Python', 'FastAPI', 'LangGraph', 'Agentic AI', 'RAG', 'Temporal', 'Kubernetes', 'AWS Bedrock'],
+
+  /* ─── Site settings (not résumé content) ────────────────────────────── */
+  site: {
+    defaultDesign: 'classic',            // shown to first-time visitors
+    designs: ['classic'],                // allow-list + picker order; ids from designs/registry.js
+    switcher: { enabled: false },        // the on-page design picker; ?switcher=1 / 0 overrides
+    url: 'https://pdz1804.github.io/',   // canonical origin, used by tools/sync-meta.js and checks
+    ogImage: 'images/PDZ.jpg',
+  },
 };
 
 /* Bar width per level — change once, every bar follows. */

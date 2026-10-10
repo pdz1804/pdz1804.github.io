@@ -263,8 +263,8 @@ const check = (cond, n, d) => (cond ? pass(n, d) : fail(n, d));
 
   const acadNums = await proj.$$eval('.acad-num', (e) => e.map((x) => x.textContent));
   // The expected numbering follows the data, so adding a project never needs a test edit.
-  const acadCount = await proj.evaluate(() => window.PORTFOLIO.projects.academic.length);
-  const expectedNums = Array.from({ length: acadCount }, (_, i) => String(i + 1).padStart(2, '0'));
+  const acadTotal = await proj.evaluate(() => window.PORTFOLIO.projects.academic.length);
+  const expectedNums = Array.from({ length: acadTotal }, (_, i) => String(i + 1).padStart(2, '0'));
   check(JSON.stringify(acadNums) === JSON.stringify(expectedNums), 'academic cards auto-numbered', acadNums.join(','));
   await proj.close();
 

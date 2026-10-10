@@ -36,6 +36,9 @@ jobs:
       - name: Validate content data
         run: node tools/validate-data.js
 
+      - name: View-model unit tests
+        run: node tools/test-view-model.js
+
       - name: Check what the site actually serves
         run: node tools/check-published.js
 

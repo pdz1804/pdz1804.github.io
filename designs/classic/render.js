@@ -4,13 +4,16 @@
    No content lives here, only presentation. Every section renders into a mount
    point marked with a data-render attribute in the HTML; a section whose mount
    point is absent is skipped, which is how one file serves both pages.
+
+   Derived figures (totals, tenure, current role, sort orders) come from
+   ctx.vm — see assets/js/core/view-model.js — so no design recomputes them.
 ============================================================================= */
 
 (function (window, document) {
   'use strict';
 
-  var D = window.PORTFOLIO;
-  var LEVELS = window.SKILL_LEVELS;
+  /* Set from ctx at the start of render(); the renderers below read them. */
+  var D, LEVELS, totals, VM;
 
   /* ── Icons ────────────────────────────────────────────────────────────── */
   var S = 'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
@@ -39,62 +42,6 @@
 
   // Stagger animation delays from position, so new entries time themselves.
   function delay(i, step) { return 'style="transition-delay:' + (i * (step || 0.07)).toFixed(2) + 's"'; }
-
-  function parseMonth(s) {
-    if (!s) return null;
-    var p = s.split('-');
-    return { y: +p[0], m: +p[1] };
-  }
-
-  function monthsBetween(from, to) {
-    return (to.y - from.y) * 12 + (to.m - from.m);
-  }
-
-  function nowMonth() {
-    var d = new Date();
-    return { y: d.getFullYear(), m: d.getMonth() + 1 };
-  }
-
-  // "1 yr 3 mos" — inclusive of the current month.
-  function humanDuration(months) {
-    months = Math.max(months, 1);
-    var y = Math.floor(months / 12), m = months % 12, out = [];
-    if (y) out.push(y + ' yr' + (y > 1 ? 's' : ''));
-    if (m) out.push(m + ' mo' + (m > 1 ? 's' : ''));
-    return out.join(' ') || '1 mo';
-  }
-
-  // Total span across a company's roles, counting an open role up to today.
-  function companyTenure(company) {
-    var starts = [], ends = [], open = false;
-    company.roles.forEach(function (r) {
-      var s = parseMonth(r.start);
-      if (s) starts.push(s);
-      if (r.end === null) open = true;
-      else { var e = parseMonth(r.end); if (e) ends.push(e); }
-    });
-    if (!starts.length) return '';
-    var first = starts.reduce(function (a, b) { return monthsBetween(b, a) > 0 ? b : a; });
-    var last  = open ? nowMonth()
-                     : ends.reduce(function (a, b) { return monthsBetween(a, b) > 0 ? b : a; }, first);
-    return humanDuration(monthsBetween(first, last) + 1);
-  }
-
-  function yearsSince(ym) {
-    var start = parseMonth(ym);
-    if (!start) return 0;
-    return Math.floor(monthsBetween(start, nowMonth()) / 12);
-  }
-
-  /* ── Derived figures — every counter on the site comes from here ──────── */
-
-  var totals = {
-    years:    yearsSince(D.profile.careerStart),
-    projects: D.projects.professional.length + D.projects.academic.length,
-    certs:    D.certifications.length,
-  };
-
-  window.PORTFOLIO_TOTALS = totals;
 
   /* ── Navigation & chrome ─────────────────────────────────────────────── */
 
@@ -182,11 +129,7 @@
 
     var card = mount('hero-card');
     if (card) {
-      // The open role, wherever it sits in the array — not simply the first.
-      var all = D.experience.reduce(function (acc, co) { return acc.concat(co.roles); }, []);
-      var current = all.filter(function (r) { return r.end === null; })
-                       .sort(function (a, b) { return (b.start || '').localeCompare(a.start || ''); })[0]
-                    || all[0];
+      var current = VM.currentRole;
       var rows = [
         ['Company',   D.profile.company],
         ['Focus',     'LLMs · RAG · Agents · MCP'],
@@ -314,10 +257,10 @@
     ec.setAttribute('data-i', i);
   }
 
-  function bindCarousels() {
+  function bindCarousels(life) {
     function current(ec) { return parseInt(ec.getAttribute('data-i') || '0', 10); }
 
-    document.addEventListener('click', function (e) {
+    life.on(document, 'click', function (e) {
       var ec = e.target.closest && e.target.closest('.ec');
       if (!ec) return;
       var dot = e.target.closest('.ec-dot');
@@ -326,7 +269,7 @@
       else if (dot) ecShow(ec, parseInt(dot.getAttribute('data-i'), 10));
     });
 
-    document.addEventListener('keydown', function (e) {
+    life.on(document, 'keydown', function (e) {
       var ec = e.target.closest && e.target.closest('.ec');
       if (!ec || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
       e.preventDefault();
@@ -335,10 +278,10 @@
 
     // Swipe on touch screens.
     var startX = null;
-    document.addEventListener('touchstart', function (e) {
+    life.on(document, 'touchstart', function (e) {
       startX = e.target.closest && e.target.closest('.ec-stage') ? e.touches[0].clientX : null;
     }, { passive: true });
-    document.addEventListener('touchend', function (e) {
+    life.on(document, 'touchend', function (e) {
       if (startX === null) return;
       var dx = e.changedTouches[0].clientX - startX;
       var ec = e.target.closest && e.target.closest('.ec');
@@ -353,17 +296,14 @@
     var el = mount('experience');
     if (!el) return;
 
-    el.innerHTML = D.experience.map(function (co, ci) {
+    el.innerHTML = VM.experience.map(function (entry, ci) {
+      var co = entry.company;
       var logo = co.logoDark
         ? '<img src="' + co.logoDark  + '" alt="' + co.company + '" class="exp-logo exp-logo-dark">' +
           '<img src="' + co.logoLight + '" alt="' + co.company + '" class="exp-logo exp-logo-light">'
         : '<span class="exp-co-badge">' + (co.logoText || co.company.slice(0, 3).toUpperCase()) + '</span>';
 
-      // Newest first, so appending a promotion with push() lands it at the top
-    // rather than the bottom — the workflow data.js and the README document.
-    var ordered = co.roles.slice().sort(function (a, b) {
-      return (b.start || '').localeCompare(a.start || '');
-    });
+      var ordered = entry.roles;
 
     var roles = ordered.map(function (role, ri) {
         var bullets = role.bullets.map(function (b) { return '<li>' + b + '</li>'; }).join('');
@@ -393,7 +333,7 @@
                  '<div class="exp-co-logo-wrap">' + logo + '</div>' +
                  '<div>' +
                    '<div class="exp-co-name">' + co.company + '</div>' +
-                   '<div class="exp-co-meta">' + companyTenure(co) + ' · ' + co.location + '</div>' +
+                   '<div class="exp-co-meta">' + entry.tenure + ' · ' + co.location + '</div>' +
                  '</div>' +
                '</div>' + roles +
              '</div>';
@@ -406,17 +346,16 @@
     var el = mount('skills');
     if (!el) return;
 
-    el.innerHTML = D.skills.map(function (group, gi) {
-      var items = group.items.map(function (s) {
-        var width = LEVELS[s.level] || LEVELS.intermediate;
-        var label = s.level.charAt(0).toUpperCase() + s.level.slice(1);
-        var meta  = label + (s.years ? ' · ' + s.years + ' yr' : '');
+    el.innerHTML = VM.skills.map(function (g, gi) {
+      var group = g.group;
+      var items = g.items.map(function (v) {
+        var s = v.skill;
         return '<div class="sk-item">' +
                  '<div class="sk-row">' +
                    '<span class="sk-name" title="' + s.name + '">' + s.name + '</span>' +
-                   '<span class="sk-meta">' + meta + '</span>' +
+                   '<span class="sk-meta">' + v.meta + '</span>' +
                  '</div>' +
-                 '<div class="sk-bar"><div class="sk-fill" data-w="' + width + '"></div></div>' +
+                 '<div class="sk-bar"><div class="sk-fill" data-w="' + v.width + '"></div></div>' +
                '</div>';
       }).join('');
 
@@ -468,10 +407,7 @@
     var el = mount('honors');
     if (!el) return;
 
-    // Stable sort: equal sortKey keeps the order written in data.js.
-    var sorted = D.honors.map(function (h, i) { return { h: h, i: i }; })
-      .sort(function (a, b) { return (b.h.sortKey - a.h.sortKey) || (a.i - b.i); })
-      .map(function (x) { return x.h; });
+    var sorted = VM.honors;
 
     el.innerHTML = sorted.map(function (h, i) {
       return '<article class="honor-card r" ' + delay(i, 0.12) + '>' +
@@ -560,11 +496,11 @@
     var el = mount('certifications');
     if (!el) return;
 
-    var sorted = D.certifications.slice().sort(function (a, b) { return b.sortKey - a.sortKey; });
+    var sorted = VM.certs;
     var visible = D.certsVisible;
 
-    function card(c, i, hidden) {
-      var iss = D.certIssuers[c.issuer] || { label: c.issuer, badge: '?', cls: '' };
+    function card(entry, i, hidden) {
+      var c = entry.cert, iss = entry.issuer;
       return '<div class="cert-card' + (hidden ? '' : ' r') + '" ' + (hidden ? '' : delay(i, 0.03)) + '>' +
                '<div class="cert-ico ' + iss.cls + '">' + iss.badge + '</div>' +
                '<div>' +
@@ -634,9 +570,14 @@
     }).join('');
   }
 
-  /* ── Boot ─────────────────────────────────────────────────────────────── */
+  /* ── Entry point ──────────────────────────────────────────────────────── */
 
-  window.renderPortfolio = function () {
+  function render(ctx) {
+    D = ctx.data;
+    LEVELS = ctx.levels;
+    VM = ctx.vm;
+    totals = VM.totals;
+
     renderNav();
     renderHero();
     renderAbout();
@@ -649,9 +590,9 @@
     renderCertifications();
     renderContact();
     renderFooter();
-  };
+    bindCarousels(ctx.life);
+  }
 
-  window.renderPortfolio();
-  bindCarousels();
+  window.ClassicRender = { render: render };
 
 })(window, document);
